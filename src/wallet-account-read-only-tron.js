@@ -18,7 +18,7 @@ import { WalletAccountReadOnly } from '@tetherto/wdk-wallet'
 
 import FailoverProvider from '@tetherto/wdk-failover-provider'
 
-import { TronWeb, Trx } from 'tronweb'
+import { TronWeb, Trx, providers } from 'tronweb'
 
 /** @typedef {import('tronweb').Types.Transaction} Transaction */
 /** @typedef {import('tronweb').Types.TriggerSmartContract} TriggerSmartContract */
