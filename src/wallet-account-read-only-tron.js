@@ -244,7 +244,9 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
     if (Array.isArray(provider)) {
       if (!provider.length) return undefined
 
-      const failoverProvider = new FailoverProvider({ retries })
+      const fullNodeFailover = new FailoverProvider({ retries })
+      const solidityNodeFailover = new FailoverProvider({ retries })
+      const eventServerFailover = new FailoverProvider({ retries })
 
       const clients = provider.map((entry) => {
         return typeof entry === 'string'
@@ -253,10 +255,16 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
       })
 
       for (const client of clients) {
-        failoverProvider.addProvider(client.fullNode)
+        fullNodeFailover.addProvider(client.fullNode)
+        solidityNodeFailover.addProvider(client.solidityNode)
+        eventServerFailover.addProvider(client.eventServer)
       }
 
-      return new TronWeb({ fullHost: failoverProvider.initialize() })
+      return new TronWeb({
+        fullNode: fullNodeFailover.initialize(),
+        solidityNode: solidityNodeFailover.initialize(),
+        eventServer: eventServerFailover.initialize(),
+      })
     }
 
     return typeof provider === 'string'
