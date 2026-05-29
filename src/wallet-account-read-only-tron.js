@@ -247,28 +247,55 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
       const fullNodeFailover = new FailoverProvider({ retries })
       const solidityNodeFailover = new FailoverProvider({ retries })
       const eventServerFailover = new FailoverProvider({ retries })
+   * @returns {TronWeb | undefined} The initialized tron web provider.
+   */
+  static initializeProvider (config) {
+  const { provider, retries = 3 } = config
 
-      const clients = provider.map((entry) => {
-        return typeof entry === 'string'
-          ? new TronWeb({ fullHost: entry })
-          : entry
-      })
+  if (Array.isArray(provider)) {
+    if (!provider.length) return undefined
 
-      for (const client of clients) {
-        fullNodeFailover.addProvider(client.fullNode)
-        solidityNodeFailover.addProvider(client.solidityNode)
-        eventServerFailover.addProvider(client.eventServer)
-      }
-
-      return new TronWeb({
-        fullNode: fullNodeFailover.initialize(),
-        solidityNode: solidityNodeFailover.initialize(),
-        eventServer: eventServerFailover.initialize()
-      })
+    // All strings: one shared pool, fanned out by TronWeb via `fullHost`.
+    if (provider.every(p => typeof p === 'string')) {
+      const fp = new FailoverProvider({ retries })
+      for (const url of provider) fp.addProvider(new providers.HttpProvider(url))
+      return new TronWeb({ fullHost: fp.initialize() })
     }
 
-    return typeof provider === 'string'
-      ? new TronWeb({ fullHost: provider })
-      : provider
+    // Contains a TronWeb: per-role pools, mutate the first TronWeb in place.
+    const fullNodes = []
+    const solidityNodes = []
+    const eventServers = []
+    let primary = null
+
+    for (const entry of provider) {
+      if (typeof entry === 'string') {
+        const http = new providers.HttpProvider(entry)
+        fullNodes.push(http)
+        solidityNodes.push(http)
+        eventServers.push(http)
+      } else {
+        fullNodes.push(entry.fullNode)
+        solidityNodes.push(entry.solidityNode)
+        eventServers.push(entry.eventServer)
+        if (!primary) primary = entry
+      }
+    }
+
+    const pool = (list) => {
+      const fp = new FailoverProvider({ retries })
+      for (const hp of list) fp.addProvider(hp)
+      return fp.initialize()
+    }
+
+    primary.setFullNode(pool(fullNodes))
+    primary.setSolidityNode(pool(solidityNodes))
+    primary.setEventServer(pool(eventServers))
+    return primary
   }
+
+  return typeof provider === 'string'
+    ? new TronWeb({ fullHost: provider })
+    : provider
+}
 }
