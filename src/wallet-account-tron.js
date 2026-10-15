@@ -94,12 +94,12 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
       if (typeof pathOrConfig !== 'string') {
         path = DEFAULT_ACCOUNT_PATH
-        config = pathOrConfig ?? {}
+        config = pathOrConfig ?? config
       }
 
       signer = new SeedSignerTron(seedOrSigner, `${BIP_44_TRON_DERIVATION_PATH_PREFIX}/${path}`)
     } else {
-      config = pathOrConfig ?? {}
+      config = pathOrConfig ?? config
     }
 
     super(undefined, config)
