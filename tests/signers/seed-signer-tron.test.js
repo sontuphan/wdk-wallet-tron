@@ -90,14 +90,20 @@ describe('SeedSignerTron', () => {
     test('should throw if the path is not absolute', () => {
       expect(() => new SeedSignerTron(SEED_PHRASE, "44'/195'"))
         .toThrow(ValueError)
+      expect(() => new SeedSignerTron(SEED_PHRASE, "44'/195'"))
+        .toThrow('The derivation path must be absolute (e.g. "m/44\'/195\'"), got "44\'/195\'".')
     })
 
     test('should throw if the path has an invalid child index', () => {
       expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/a'"))
         .toThrow(ValueError)
+      expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/a'"))
+        .toThrow('The derivation path "44\'/a\'" has an invalid child index: "a\'".')
 
       expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/2147483648'"))
         .toThrow(ValueError)
+      expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/2147483648'"))
+        .toThrow('The derivation path "44\'/2147483648\'" has an invalid child index: "2147483648\'".')
     })
   })
 
@@ -142,18 +148,26 @@ describe('SeedSignerTron', () => {
     test('should throw if the path is not valid', async () => {
       const root = new SeedSignerTron(SEED_PHRASE)
 
-      await expect(root.derive("a'/b/c")).rejects.toThrow(ValueError)
-      await expect(root.derive('-1')).rejects.toThrow(ValueError)
-      await expect(root.derive("m/0'")).rejects.toThrow(ValueError)
+      await expect(root.derive("a'/b/c")).rejects.toBeInstanceOf(ValueError)
+      await expect(root.derive("a'/b/c")).rejects.toThrow('The derivation path "a\'/b/c" has an invalid child index: "a\'".')
+      await expect(root.derive('-1')).rejects.toBeInstanceOf(ValueError)
+      await expect(root.derive('-1')).rejects.toThrow('The derivation path "-1" has an invalid child index: "-1".')
+      await expect(root.derive("m/0'")).rejects.toBeInstanceOf(ValueError)
+      await expect(root.derive("m/0'")).rejects.toThrow('The derivation path "m/0\'" has an invalid child index: "m".')
     })
 
     test('should throw if a child index has leading zeros', async () => {
       const root = new SeedSignerTron(SEED_PHRASE)
 
       await expect(root.derive("0'/0/01"))
-        .rejects.toThrow(new ValueError('The derivation path "0\'/0/01" has an invalid child index: "01".'))
+        .rejects.toBeInstanceOf(ValueError)
+      await expect(root.derive("0'/0/01"))
+        .rejects.toThrow('The derivation path "0\'/0/01" has an invalid child index: "01".')
 
-      expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/0195'")).toThrow(ValueError)
+      expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/0195'"))
+        .toThrow(ValueError)
+      expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/0195'"))
+        .toThrow('The derivation path "44\'/0195\'" has an invalid child index: "0195\'".')
     })
   })
 

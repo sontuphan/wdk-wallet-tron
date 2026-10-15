@@ -56,7 +56,8 @@ describe('PrivateKeySignerTron', () => {
     test('should throw an unsupported operation error', async () => {
       const signer = new PrivateKeySignerTron(ACCOUNT.keyPair.privateKey)
 
-      await expect(signer.derive("0'/0/0")).rejects.toThrow(UnsupportedOperationError)
+      await expect(signer.derive("0'/0/0")).rejects.toBeInstanceOf(UnsupportedOperationError)
+      await expect(signer.derive("0'/0/0")).rejects.toThrow('derive(path)')
     })
   })
 

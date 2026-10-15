@@ -22,7 +22,7 @@ jest.unstable_mockModule('tronweb', () => {
   }
 })
 
-const { default: WalletManagerTron, WalletAccountTron, InvalidSignerError } = await import('../index.js')
+const { default: WalletManagerTron, WalletAccountTron, InvalidSignerError, ValueError } = await import('../index.js')
 const { SeedSignerTron, PrivateKeySignerTron } = await import('../src/signers/index.js')
 
 const PRIVATE_KEY = '5d5645db7db2a3b86435e3ec9b3b2cc670fccef5b6d5705e310b8ac2d8d37633'
@@ -68,6 +68,8 @@ describe('WalletManagerTron', () => {
     test('should throw if the default signer is not derivable', () => {
       expect(() => new WalletManagerTron(new PrivateKeySignerTron(PRIVATE_KEY)))
         .toThrow(InvalidSignerError)
+      expect(() => new WalletManagerTron(new PrivateKeySignerTron(PRIVATE_KEY)))
+        .toThrow('The default signer must be derivable. Non-derivable signers (e.g. private-key signers) can only be registered by name via addSigner.')
     })
 
     test('should throw if the seed phrase is invalid', () => {
@@ -170,7 +172,9 @@ describe('WalletManagerTron', () => {
 
     test('should throw if the index is a negative number', async () => {
       await expect(wallet.getAccount(-1))
-        .rejects.toThrow('invalid child index')
+        .rejects.toBeInstanceOf(ValueError)
+      await expect(wallet.getAccount(-1))
+        .rejects.toThrow('The derivation path "0\'/0/-1" has an invalid child index: "-1".')
     })
   })
 
@@ -185,7 +189,9 @@ describe('WalletManagerTron', () => {
 
     test('should throw if the path is invalid', async () => {
       await expect(wallet.getAccountByPath("a'/b/c"))
-        .rejects.toThrow('invalid child index')
+        .rejects.toBeInstanceOf(ValueError)
+      await expect(wallet.getAccountByPath("a'/b/c"))
+        .rejects.toThrow('The derivation path "a\'/b/c" has an invalid child index: "a\'".')
     })
   })
 
