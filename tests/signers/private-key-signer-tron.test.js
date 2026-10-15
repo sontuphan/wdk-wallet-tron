@@ -81,6 +81,16 @@ describe('PrivateKeySignerTron', () => {
   })
 
   describe('dispose', () => {
+    test('should stay disposed when disposed twice', () => {
+      const signer = new PrivateKeySignerTron(ACCOUNT.keyPair.privateKey)
+
+      signer.dispose()
+      signer.dispose()
+
+      expect(signer.disposed).toBe(true)
+      expect(signer.keyPair.privateKey).toBeNull()
+    })
+
     test('should erase the private key and mark the signer as disposed', () => {
       const signer = new PrivateKeySignerTron(ACCOUNT.keyPair.privateKey)
       const { privateKey } = signer.keyPair

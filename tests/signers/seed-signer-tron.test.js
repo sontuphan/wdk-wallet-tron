@@ -255,6 +255,16 @@ describe('SeedSignerTron', () => {
       await expect(call(signer)).rejects.toThrow(DISPOSAL_ERROR)
     })
 
+    test('should stay disposed when disposed twice', () => {
+      const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT_0.path)
+
+      signer.dispose()
+      signer.dispose()
+
+      expect(signer.disposed).toBe(true)
+      expect(signer.keyPair.privateKey).toBeNull()
+    })
+
     test('should keep returning the address once disposed', async () => {
       const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT_0.path)
 

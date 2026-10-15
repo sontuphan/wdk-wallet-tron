@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
 
+import * as bip39 from 'bip39'
+
 import { TronWeb, Trx } from 'tronweb'
 
 const SEED_PHRASE = 'cook voyage document eight skate token alien guide drink uncle term abuse'
@@ -29,6 +31,7 @@ const PRIVATE_KEY = '5d5645db7db2a3b86435e3ec9b3b2cc670fccef5b6d5705e310b8ac2d8d
 const ACCOUNT_0_ADDRESS = 'TXngH8bVadn9ZWtKBgjKQcqN1GsZ7A1jcb'
 const ACCOUNT_1_ADDRESS = 'TLeUMvxvtUmbCyHAzf3FKV7C2FxquGDWUj'
 const SECOND_SEED_PHRASE = 'test walk nut penalty hip pave soap entry language right filter choice'
+const COIN_NODE_ADDRESS = 'TNKypw2WjeChcDkRJ5zkBxZqxUCrhUG1Ao'
 const UNSUPPORTED_DERIVATION_ERROR = new InvalidSignerError('The signer does not support account derivation.')
 
 describe('WalletManagerTron', () => {
@@ -79,6 +82,21 @@ describe('WalletManagerTron', () => {
   })
 
   describe('dispose', () => {
+    test('should not wipe a seed supplied by the caller', async () => {
+      const seed = Uint8Array.from(bip39.mnemonicToSeedSync(SEED_PHRASE))
+      const copy = Uint8Array.from(seed)
+      const wallet = new WalletManagerTron(seed)
+
+      const account = await wallet.getAccount(0)
+
+      expect(account.path).toBe("m/44'/195'/0'/0/0")
+      expect(await account.getAddress()).toBe(ACCOUNT_0_ADDRESS)
+
+      wallet.dispose()
+
+      expect(seed).toEqual(copy)
+    })
+
     test('should dispose the accounts and the default signer built from a seed', async () => {
       const wallet = new WalletManagerTron(SEED_PHRASE)
       const account = await wallet.getAccount(0)
@@ -110,6 +128,15 @@ describe('WalletManagerTron', () => {
   })
 
   describe('signers', () => {
+    test('should use a named derivable signer as is, without derivation', async () => {
+      wallet.addSigner('second', new SeedSignerTron(SEED_PHRASE))
+
+      const account = await wallet.getAccount('second')
+
+      expect(account.path).toBe("m/44'/195'")
+      expect(await account.getAddress()).toBe(COIN_NODE_ADDRESS)
+    })
+
     test('should return the account of a named non-derivable signer', async () => {
       wallet.addSigner('hot', new PrivateKeySignerTron(PRIVATE_KEY))
 

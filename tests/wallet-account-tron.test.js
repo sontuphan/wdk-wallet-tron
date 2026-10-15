@@ -426,6 +426,17 @@ describe('WalletAccountTron', () => {
       })
     })
 
+    test('should keep the signatures a prebuilt transaction already carries', async () => {
+      const DUMMY_SIGNATURE = 'aa'.repeat(65)
+
+      const signedTx = await account.signTransaction({ ...CONSISTENT_PREBUILT_TX, signature: [DUMMY_SIGNATURE] })
+
+      expect(signedTx).toEqual({
+        ...CONSISTENT_PREBUILT_TX,
+        signature: [DUMMY_SIGNATURE, CONSISTENT_PREBUILT_SIGNATURE]
+      })
+    })
+
     test('should throw if a prebuilt txID does not match its raw data', async () => {
       const tamperedTx = {
         ...CONSISTENT_PREBUILT_TX,
