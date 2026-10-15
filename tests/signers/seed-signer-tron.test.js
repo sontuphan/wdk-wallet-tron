@@ -82,6 +82,11 @@ describe('SeedSignerTron', () => {
         .toThrow(new ValueError('The seed phrase is invalid.'))
     })
 
+    test.each([15, 65])('should throw if the seed is %i bytes long', (length) => {
+      expect(() => new SeedSignerTron(new Uint8Array(length).fill(1)))
+        .toThrow(new ValueError('The seed must be between 16 and 64 bytes.'))
+    })
+
     test('should throw if the path is not absolute', () => {
       expect(() => new SeedSignerTron(SEED_PHRASE, "44'/195'"))
         .toThrow(ValueError)

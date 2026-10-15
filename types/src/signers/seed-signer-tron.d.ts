@@ -24,7 +24,7 @@ export default class SeedSignerTron implements ISignerTron {
      *
      * @param {string | Uint8Array} seed - A [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
      * @param {string} [path] - An absolute BIP-32 path (default: "m/44'/195'").
-     * @throws {ValueError} If the seed phrase is invalid, or if the path is not valid.
+     * @throws {ValueError} If the seed phrase is invalid, if the seed is not 16 to 64 bytes, or if the path is not valid.
      */
     constructor(seed: string | Uint8Array, path?: string);
     /**

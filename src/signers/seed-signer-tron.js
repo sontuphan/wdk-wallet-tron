@@ -95,7 +95,7 @@ export default class SeedSignerTron {
    *
    * @param {string | Uint8Array} seed - A [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
    * @param {string} [path] - An absolute BIP-32 path (default: "m/44'/195'").
-   * @throws {ValueError} If the seed phrase is invalid, or if the path is not valid.
+   * @throws {ValueError} If the seed phrase is invalid, if the seed is not 16 to 64 bytes, or if the path is not valid.
    */
   constructor (seed, path = BIP_44_TRON_DERIVATION_PATH_PREFIX) {
     const ownsSeed = typeof seed === 'string'
@@ -106,6 +106,8 @@ export default class SeedSignerTron {
       }
 
       seed = bip39.mnemonicToSeedSync(seed)
+    } else if (seed.length < 16 || seed.length > 64) {
+      throw new ValueError('The seed must be between 16 and 64 bytes.')
     }
 
     let indexes, master
