@@ -116,8 +116,10 @@ export function signTransaction (privateKey, transaction) {
 
   const serializedSignature = r + s + v
 
+  const signatures = 'signature' in transaction ? transaction.signature ?? [] : []
+
   return {
     ...transaction,
-    signature: [...(transaction.signature ?? []), serializedSignature]
+    signature: [...signatures, serializedSignature]
   }
 }

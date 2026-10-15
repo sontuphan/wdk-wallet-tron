@@ -20,6 +20,7 @@ import WalletAccountTron from './wallet-account-tron.js'
 import SeedSignerTron from './signers/seed-signer-tron.js'
 
 /** @typedef {import("@tetherto/wdk-wallet").FeeRates} FeeRates */
+/** @typedef {import('@tetherto/wdk-wallet').ValueError} ValueError */
 
 /** @typedef {import('./wallet-account-tron.js').TronWalletConfig} TronWalletConfig */
 

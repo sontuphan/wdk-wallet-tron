@@ -48,6 +48,7 @@ export { default as WalletAccountTron } from './src/wallet-account-tron.js'
 export {
   DisposalError,
   InvalidSignerError,
+  NoSuchElementError,
   UnsupportedOperationError,
   ValueError
 } from '@tetherto/wdk-wallet'
