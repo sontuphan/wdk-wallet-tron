@@ -146,6 +146,15 @@ describe('SeedSignerTron', () => {
       await expect(root.derive('-1')).rejects.toThrow(ValueError)
       await expect(root.derive("m/0'")).rejects.toThrow(ValueError)
     })
+
+    test('should throw if a child index has leading zeros', async () => {
+      const root = new SeedSignerTron(SEED_PHRASE)
+
+      await expect(root.derive("0'/0/01"))
+        .rejects.toThrow(new ValueError('The derivation path "0\'/0/01" has an invalid child index: "01".'))
+
+      expect(() => new SeedSignerTron(SEED_PHRASE, "m/44'/0195'")).toThrow(ValueError)
+    })
   })
 
   describe('sign', () => {

@@ -48,7 +48,7 @@ export function parseDerivationPath (path, absolute = false) {
   }
 
   return path.split('/').map((segment) => {
-    const match = /^(\d+)(')?$/.exec(segment)
+    const match = /^(0|[1-9]\d*)(')?$/.exec(segment)
 
     const index = match ? Number(match[1]) : NaN
 
