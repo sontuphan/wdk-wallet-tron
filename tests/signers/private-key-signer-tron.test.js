@@ -92,13 +92,15 @@ describe('PrivateKeySignerTron', () => {
       expect(privateKey.every((byte) => byte === 0)).toBe(true)
     })
 
-    test('should throw on key-using methods once disposed', async () => {
+    test.each([
+      ['sign', (signer) => signer.sign(MESSAGE)],
+      ['signTransaction', (signer) => signer.signTransaction(TRANSACTION)]
+    ])('should throw from %s once disposed', async (_, call) => {
       const signer = new PrivateKeySignerTron(ACCOUNT.keyPair.privateKey)
 
       signer.dispose()
 
-      await expect(signer.sign(MESSAGE)).rejects.toThrow(DISPOSAL_ERROR)
-      await expect(signer.signTransaction(TRANSACTION)).rejects.toThrow(DISPOSAL_ERROR)
+      await expect(call(signer)).rejects.toThrow(DISPOSAL_ERROR)
     })
   })
 

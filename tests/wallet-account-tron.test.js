@@ -192,17 +192,18 @@ describe('WalletAccountTron', () => {
       expect(account.disposed).toBe(true)
     })
 
-    test('should throw on signing operations once disposed', async () => {
+    test.each([
+      ['sign', (account) => account.sign('Dummy message to sign.')],
+      ['signTransaction', (account) => account.signTransaction({ to: RECIPIENT, value: 1 })],
+      ['sendTransaction', (account) => account.sendTransaction({ to: RECIPIENT, value: 1 })],
+      ['transfer', (account) => account.transfer({ token: RECIPIENT, recipient: RECIPIENT, amount: 1 })],
+      ['approve', (account) => account.approve({ token: RECIPIENT, spender: RECIPIENT, amount: 1 })]
+    ])('should throw from %s once disposed', async (_, call) => {
       const account = new WalletAccountTron(SEED_PHRASE, "0'/0/0", { provider: 'https://tron.web.provider/' })
-      const error = new DisposalError('The wallet account has been disposed.')
 
       account.dispose()
 
-      await expect(account.sign('Dummy message to sign.')).rejects.toThrow(error)
-      await expect(account.signTransaction({ to: RECIPIENT, value: 1 })).rejects.toThrow(error)
-      await expect(account.sendTransaction({ to: RECIPIENT, value: 1 })).rejects.toThrow(error)
-      await expect(account.transfer({ token: RECIPIENT, recipient: RECIPIENT, amount: 1 })).rejects.toThrow(error)
-      await expect(account.approve({ token: RECIPIENT, spender: RECIPIENT, amount: 1 })).rejects.toThrow(error)
+      await expect(call(account)).rejects.toThrow(new DisposalError('The wallet account has been disposed.'))
     })
 
     test('should throw a disposal error from approve before checking the provider', async () => {

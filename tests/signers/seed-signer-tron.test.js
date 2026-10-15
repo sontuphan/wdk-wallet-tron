@@ -223,33 +223,36 @@ describe('SeedSignerTron', () => {
       expect(privateKey.every((byte) => byte === 0)).toBe(true)
     })
 
-    test('should not affect the parent or the children of the disposed signer', async () => {
+    test('should not affect the children of the disposed signer', async () => {
       const root = new SeedSignerTron(SEED_PHRASE)
       const child = await root.derive("0'/0/0")
-      const sibling = await root.derive("0'/0/1")
 
       root.dispose()
 
       expect(child.disposed).toBe(false)
       expect(await child.sign(MESSAGE)).toBe(MESSAGE_SIGNATURE)
-
-      const root2 = new SeedSignerTron(SEED_PHRASE)
-      const child2 = await root2.derive("0'/0/0")
-
-      child2.dispose()
-
-      expect(root2.disposed).toBe(false)
-      expect((await root2.derive("0'/0/1")).path).toBe(sibling.path)
     })
 
-    test('should throw on key-using methods once disposed', async () => {
+    test('should not affect the parent of the disposed signer', async () => {
+      const root = new SeedSignerTron(SEED_PHRASE)
+      const child = await root.derive("0'/0/0")
+
+      child.dispose()
+
+      expect(root.disposed).toBe(false)
+      expect(await (await root.derive("0'/0/1")).getAddress()).toBe(ACCOUNT_1.address)
+    })
+
+    test.each([
+      ['derive', (signer) => signer.derive("0'/0/0")],
+      ['sign', (signer) => signer.sign(MESSAGE)],
+      ['signTransaction', (signer) => signer.signTransaction(TRANSACTION)]
+    ])('should throw from %s once disposed', async (_, call) => {
       const signer = new SeedSignerTron(SEED_PHRASE)
 
       signer.dispose()
 
-      await expect(signer.derive("0'/0/0")).rejects.toThrow(DISPOSAL_ERROR)
-      await expect(signer.sign(MESSAGE)).rejects.toThrow(DISPOSAL_ERROR)
-      await expect(signer.signTransaction(TRANSACTION)).rejects.toThrow(DISPOSAL_ERROR)
+      await expect(call(signer)).rejects.toThrow(DISPOSAL_ERROR)
     })
 
     test('should keep returning the address once disposed', async () => {
