@@ -16,6 +16,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @overload
      * @param {ISignerTron} signer - The tron signer, derived to an account path.
      * @param {TronWalletConfig & SignerOptions} [config] - The configuration object.
+     * @throws {ValueError} If a derivation path is given along with the signer.
      */
     constructor(signer: ISignerTron, config?: TronWalletConfig & SignerOptions);
     /**

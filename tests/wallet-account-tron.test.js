@@ -135,6 +135,13 @@ describe('WalletAccountTron', () => {
         expect(account.keyPair).toEqual(signer.keyPair)
       })
 
+      test('should throw if a path is given along with the signer', () => {
+        const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
+
+        expect(() => new WalletAccountTron(signer, "0'/0/0", { provider: 'https://tron.web.provider/' }))
+          .toThrow(new ValueError('A derivation path cannot be given with a signer; derive the signer instead (e.g. signer.derive(path)).'))
+      })
+
       test('should initialize without a config', async () => {
         const account = new WalletAccountTron(new SeedSignerTron(SEED_PHRASE, ACCOUNT.path))
 
