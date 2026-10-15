@@ -104,21 +104,21 @@ export default class SeedSignerTron {
       if (!bip39.validateMnemonic(seed)) {
         throw new ValueError('The seed phrase is invalid.')
       }
-
-      seed = bip39.mnemonicToSeedSync(seed)
     } else if (seed.length < 16 || seed.length > 64) {
       throw new ValueError('The seed must be between 16 and 64 bytes.')
     }
+
+    const seedBytes = ownsSeed ? bip39.mnemonicToSeedSync(seed) : seed
 
     let indexes, master
 
     try {
       indexes = parseDerivationPath(path, true)
 
-      master = HDKey.fromMasterSeed(seed)
+      master = HDKey.fromMasterSeed(seedBytes)
     } finally {
       if (ownsSeed) {
-        sodium_memzero(seed)
+        sodium_memzero(seedBytes)
       }
     }
 
