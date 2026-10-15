@@ -194,6 +194,15 @@ describe('WalletAccountTron', () => {
       await expect(account.approve({ token: RECIPIENT, spender: RECIPIENT, amount: 1 })).rejects.toThrow(error)
     })
 
+    test('should throw a disposal error from approve before checking the provider', async () => {
+      const account = new WalletAccountTron(SEED_PHRASE, "0'/0/0")
+
+      account.dispose()
+
+      await expect(account.approve({ token: RECIPIENT, spender: RECIPIENT, amount: 1 }))
+        .rejects.toThrow(new DisposalError('The wallet account has been disposed.'))
+    })
+
     test('should still return the address once disposed', async () => {
       const account = new WalletAccountTron(SEED_PHRASE, "0'/0/0")
 

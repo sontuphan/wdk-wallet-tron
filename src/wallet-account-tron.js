@@ -363,9 +363,14 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    *
    * @param {ApproveOptions} options - The approve options.
    * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
+   * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
    */
   async approve (options) {
+    if (this._disposed) {
+      throw new DisposalError('The wallet account has been disposed.')
+    }
+
     if (!this._tronWeb) {
       throw new Error('The wallet must be connected to tron web to approve funds.')
     }
