@@ -629,13 +629,12 @@ describe('WalletAccountReadOnlyTron', () => {
 
       const info = await account.getTransaction(TRANSACTION_HASH)
 
-      expect(info).toMatchObject({
+      expect(info).toStrictEqual({
         hash: TRANSACTION_HASH,
         finality: 'pending',
         confirmations: null,
         receipt: null
       })
-      expect(info.success).toBeUndefined()
       expect(getConfirmedCurrentBlockMock).not.toHaveBeenCalled()
 
       expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
@@ -655,15 +654,15 @@ describe('WalletAccountReadOnlyTron', () => {
 
       const info = await account.getTransaction(TRANSACTION_HASH)
 
-      expect(info).toMatchObject({
+      expect(info).toStrictEqual({
         hash: TRANSACTION_HASH,
         finality: 'confirmed',
         success: true,
         block: 12345,
         fee: 1000n,
-        confirmations: 0
+        confirmations: 0,
+        receipt: DUMMY_TRANSACTION_INFO
       })
-      expect(info.receipt).toEqual(DUMMY_TRANSACTION_INFO)
 
       expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
       expect(getConfirmedCurrentBlockMock).toHaveBeenCalledWith()

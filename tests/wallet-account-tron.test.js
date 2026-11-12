@@ -892,10 +892,11 @@ describe('WalletAccountTron', () => {
         transactionMaxFee: 245_000n
       })
 
-      const { hash, fee } = await accountWithMaxFee.sendTransaction(TRANSACTION)
+      const { hash, fee, activationFee } = await accountWithMaxFee.sendTransaction(TRANSACTION)
 
       expect(hash).toBe(DUMMY_TX_ID)
       expect(fee).toBe(245_000n)
+      expect(activationFee).toBe(0n)
 
       expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
       expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
@@ -932,10 +933,11 @@ describe('WalletAccountTron', () => {
         transactionMaxFee: 300_000n
       })
 
-      const { hash, fee } = await accountWithMaxFee.sendTransaction(TRANSACTION)
+      const { hash, fee, activationFee } = await accountWithMaxFee.sendTransaction(TRANSACTION)
 
       expect(hash).toBe(DUMMY_TX_ID)
       expect(fee).toBe(245_000n)
+      expect(activationFee).toBe(0n)
 
       expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
       expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
@@ -1158,9 +1160,11 @@ describe('WalletAccountTron', () => {
     })
 
     test('should accept the amount as a number', async () => {
-      const { hash } = await account.approve({ ...APPROVE, amount: 100_000_000 })
+      const { hash, fee, activationFee } = await account.approve({ ...APPROVE, amount: 100_000_000 })
 
       expect(hash).toBe(DUMMY_TX_ID)
+      expect(fee).toBe(4_200_000n)
+      expect(activationFee).toBe(0n)
       expect(triggerSmartContractMock).toHaveBeenCalledWith(
         APPROVE.token,
         'approve(address,uint256)',
