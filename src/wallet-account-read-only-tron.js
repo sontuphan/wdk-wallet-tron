@@ -507,7 +507,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
       throw new ProviderRequiredError('The wallet must be connected to tron web to fetch transactions.')
     }
 
-    if (typeof hash !== 'string' || !/^(0x)?[0-9a-fA-F]{64}$/.test(hash.trim())) {
+    if (!/^(0x)?[0-9a-fA-F]{64}$/.test(hash.trim())) {
       throw new ValueError(`Invalid transaction id: '${hash}'.`)
     }
 
