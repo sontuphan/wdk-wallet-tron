@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, jest, test } from '@jest/globals'
 
 import { TronWeb, Trx } from 'tronweb'
-import { NoSuchElementError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
+import { NoSuchElementError, ProviderRequiredError, TransferError, ValueError } from '@tetherto/wdk-wallet'
 
 const ADDRESS = 'TXngH8bVadn9ZWtKBgjKQcqN1GsZ7A1jcb'
 
@@ -475,7 +475,7 @@ describe('WalletAccountReadOnlyTron', () => {
       expect(activationFee).toBe(undefined)
     })
 
-    test('should throw "Insufficient token balance" when simulation reverts and balance is below the transfer amount', async () => {
+    test('should throw an insufficient token balance transfer error when simulation reverts and balance is below the transfer amount', async () => {
       const TRANSFER = {
         token: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
         recipient: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
@@ -490,7 +490,7 @@ describe('WalletAccountReadOnlyTron', () => {
       })
 
       await expect(account.quoteTransfer(TRANSFER))
-        .rejects.toThrow('Insufficient token balance for the transfer.')
+        .rejects.toThrow(expect.objectContaining({ constructor: TransferError, message: 'Insufficient token balance for the transfer.', reason: 'INSUFFICIENT_TOKEN_BALANCE' }))
 
       expect(triggerConstantContractMock).toHaveBeenNthCalledWith(
         1,

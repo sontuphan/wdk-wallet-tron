@@ -329,6 +329,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @returns {Promise<TransferResult>} The transfer's result.
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {MaximumFeeExceededError} If the transfer's cost exceeds the maximum transfer fee option.
+   * @throws {TransferError} If the account's token balance is below the transfer amount.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async transfer ({ token, recipient, amount }) {

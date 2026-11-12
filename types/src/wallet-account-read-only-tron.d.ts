@@ -137,6 +137,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @param {TransferOptions} options - The transfer's options.
      * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     * @throws {TransferError} If the account's token balance is below the transfer amount.
      */
     quoteTransfer(options: TransferOptions): Promise<Omit<TransferResult, "hash">>;
     /**

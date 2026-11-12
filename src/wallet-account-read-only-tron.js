@@ -14,7 +14,7 @@
 
 'use strict'
 
-import { WalletAccountReadOnly, NoSuchElementError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
+import { WalletAccountReadOnly, NoSuchElementError, ProviderRequiredError, TransferError, TransferErrorReason, ValueError } from '@tetherto/wdk-wallet'
 
 import FailoverProvider from '@tetherto/wdk-failover-provider'
 
@@ -402,6 +402,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * @param {TransferOptions} options - The transfer's options.
    * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+   * @throws {TransferError} If the account's token balance is below the transfer amount.
    */
   async quoteTransfer ({ token, recipient, amount }) {
     if (!this._tronWeb) {
@@ -424,7 +425,10 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
       if (error.message?.includes('REVERT')) {
         const balance = await this.getTokenBalance(token)
         if (balance < BigInt(amount)) {
-          throw new Error('Insufficient token balance for the transfer.')
+          throw new TransferError('Insufficient token balance for the transfer.', {
+            reason: TransferErrorReason.INSUFFICIENT_TOKEN_BALANCE,
+            cause: error
+          })
         }
       }
 

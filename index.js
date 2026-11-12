@@ -54,6 +54,8 @@ export {
   NoSuchElementError,
   NotImplementedError,
   ProviderRequiredError,
+  TransferError,
+  TransferErrorReason,
   UnsupportedOperationError,
   ValueError,
   WdkError
