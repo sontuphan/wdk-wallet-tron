@@ -122,11 +122,11 @@ export default class SeedSignerTron {
       }
     }
 
-    this._init(deriveAndScrub(master, indexes), path)
+    this._init(path, deriveAndScrub(master, indexes))
   }
 
   /** @private */
-  _init (node, path) {
+  _init (path, node) {
     /** @private */
     this._node = node
 
@@ -202,7 +202,7 @@ export default class SeedSignerTron {
     const node = deriveAndScrub(this._node.deriveChild(first), rest)
 
     const signer = Object.create(SeedSignerTron.prototype)
-    signer._init(node, `${this._path}/${relPath}`)
+    signer._init(`${this._path}/${relPath}`, node)
 
     return signer
   }
