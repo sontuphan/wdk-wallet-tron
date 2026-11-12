@@ -14,7 +14,7 @@
 
 'use strict'
 
-import WalletManager, { InvalidSignerError, ProviderRequiredError } from '@tetherto/wdk-wallet'
+import WalletManager, { DisposalError, InvalidSignerError, ProviderRequiredError } from '@tetherto/wdk-wallet'
 
 import WalletAccountTron from './wallet-account-tron.js'
 import SeedSignerTron from './signers/seed-signer-tron.js'
@@ -22,7 +22,6 @@ import SeedSignerTron from './signers/seed-signer-tron.js'
 /** @typedef {import('@tetherto/wdk-wallet').FeeRates} FeeRates */
 /** @typedef {import('@tetherto/wdk-wallet').ValueError} ValueError */
 /** @typedef {import('@tetherto/wdk-wallet').NoSuchElementError} NoSuchElementError */
-/** @typedef {import('@tetherto/wdk-wallet').DisposalError} DisposalError */
 
 /** @typedef {import('./wallet-account-tron.js').TronWalletConfig} TronWalletConfig */
 
@@ -126,7 +125,7 @@ export default class WalletManagerTron extends WalletManager {
    * @throws {ValueError} If the index is not an integer between 0 and 2^31 - 1.
    * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
    * @throws {InvalidSignerError} If the signer doesn't support account derivation.
-   * @throws {DisposalError} If the signer has been disposed.
+   * @throws {DisposalError} If the wallet manager or the signer has been disposed.
    * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
    */
 
@@ -141,16 +140,27 @@ export default class WalletManagerTron extends WalletManager {
    * @param {string} signerName - The signer name registered via {@link addSigner}.
    * @returns {Promise<WalletAccountTron>} The account.
    * @throws {NoSuchElementError} If no signer is registered with the given name.
+   * @throws {DisposalError} If the wallet manager or the given signer has been disposed.
    */
 
   async getAccount (indexOrSignerName = 0, options = {}) {
     if (typeof indexOrSignerName === 'string') {
       const signerName = indexOrSignerName
 
+      if (this.disposed) {
+        throw new DisposalError('The wallet manager has been disposed.')
+      }
+
       const key = `signer:${signerName}`
 
       if (!this._accounts[key]) {
-        this._accounts[key] = new WalletAccountTron(this.getSigner(signerName), this._accountConfig())
+        const signer = this.getSigner(signerName)
+
+        if (signer.disposed) {
+          throw new DisposalError('The given signer has been disposed.')
+        }
+
+        this._accounts[key] = new WalletAccountTron(signer, this._accountConfig())
       }
 
       return this._accounts[key]
@@ -171,9 +181,13 @@ export default class WalletManagerTron extends WalletManager {
    * @throws {ValueError} If the path is not valid.
    * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
    * @throws {InvalidSignerError} If the signer doesn't support account derivation.
-   * @throws {DisposalError} If the signer has been disposed.
+   * @throws {DisposalError} If the wallet manager or the signer has been disposed.
    */
   async getAccountByPath (path, options = {}) {
+    if (this.disposed) {
+      throw new DisposalError('The wallet manager has been disposed.')
+    }
+
     const { signerName } = options
     const key = signerName === undefined ? `path:${path}` : `path:${signerName}:${path}`
 

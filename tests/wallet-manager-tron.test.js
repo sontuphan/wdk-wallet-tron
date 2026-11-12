@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
 
-import { ProviderRequiredError } from '@tetherto/wdk-wallet'
+import { DisposalError, ProviderRequiredError } from '@tetherto/wdk-wallet'
 
 import * as bip39 from 'bip39'
 
@@ -120,6 +120,39 @@ describe('WalletManagerTron', () => {
       wallet.dispose()
 
       expect(disposeSpy).toHaveBeenCalledTimes(1)
+    })
+
+    test('should throw on getAccount by name after the manager is disposed', async () => {
+      const wallet = new WalletManagerTron(new SeedSignerTron(SEED_PHRASE)).addSigner('hot', new PrivateKeySignerTron(PRIVATE_KEY))
+      wallet.dispose()
+
+      await expect(wallet.getAccount('hot'))
+        .rejects.toStrictEqual(new DisposalError('The wallet manager has been disposed.'))
+    })
+
+    test('should throw on getAccount by index after a manager with a caller-owned signer is disposed', async () => {
+      const wallet = new WalletManagerTron(new SeedSignerTron(SEED_PHRASE))
+      wallet.dispose()
+
+      await expect(wallet.getAccount(0))
+        .rejects.toStrictEqual(new DisposalError('The wallet manager has been disposed.'))
+    })
+
+    test('should throw on getAccountByPath after the manager is disposed', async () => {
+      const wallet = new WalletManagerTron(new SeedSignerTron(SEED_PHRASE))
+      wallet.dispose()
+
+      await expect(wallet.getAccountByPath("0'/0/0"))
+        .rejects.toStrictEqual(new DisposalError('The wallet manager has been disposed.'))
+    })
+
+    test('should throw on getAccount by name if the named signer is disposed', async () => {
+      const signer = new PrivateKeySignerTron(PRIVATE_KEY)
+      const wallet = new WalletManagerTron(SEED_PHRASE).addSigner('hot', signer)
+      signer.dispose()
+
+      await expect(wallet.getAccount('hot'))
+        .rejects.toStrictEqual(new DisposalError('The given signer has been disposed.'))
     })
 
     test('should not dispose signers supplied by the caller', async () => {
