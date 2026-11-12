@@ -86,11 +86,7 @@ describe('WalletManagerTron', () => {
       const seed = Uint8Array.from(bip39.mnemonicToSeedSync(SEED_PHRASE))
       const copy = Uint8Array.from(seed)
       const wallet = new WalletManagerTron(seed)
-
-      const account = await wallet.getAccount(0)
-
-      expect(account.path).toBe("m/44'/195'/0'/0/0")
-      expect(await account.getAddress()).toBe(ACCOUNT_0_ADDRESS)
+      await wallet.getAccount(0)
 
       wallet.dispose()
 
@@ -214,6 +210,12 @@ describe('WalletManagerTron', () => {
       expect(account).toBeInstanceOf(WalletAccountTron)
       expect(account.path).toBeNull()
       expect(await account.getAddress()).toBe(ACCOUNT_0_ADDRESS)
+    })
+
+    test('should return the same account on repeated calls for a named signer', async () => {
+      wallet.addSigner('hot', new PrivateKeySignerTron(PRIVATE_KEY))
+      const account = await wallet.getAccount('hot')
+
       expect(await wallet.getAccount('hot')).toBe(account)
     })
 
@@ -224,6 +226,12 @@ describe('WalletManagerTron', () => {
 
       expect(account.path).toBe("m/44'/195'/0'/0/0")
       expect(await account.getAddress()).toBe('TELqMyNVc8Y7kAMpnmjxcQxk4Mb4BvvFjv')
+    })
+
+    test('should return the same account by index and by path for a named derivable signer', async () => {
+      wallet.addSigner('second', new SeedSignerTron(SECOND_SEED_PHRASE))
+      const account = await wallet.getAccount(0, { signerName: 'second' })
+
       expect(await wallet.getAccountByPath("0'/0/0", { signerName: 'second' })).toBe(account)
     })
 
@@ -270,6 +278,15 @@ describe('WalletManagerTron', () => {
       const account = await wallet.getAccount()
 
       expect(account).toBeInstanceOf(WalletAccountTron)
+
+      expect(account.path).toBe("m/44'/195'/0'/0/0")
+      expect(await account.getAddress()).toBe(ACCOUNT_0_ADDRESS)
+    })
+
+    test('should derive the account at index 0 from a raw seed', async () => {
+      const wallet = new WalletManagerTron(Uint8Array.from(bip39.mnemonicToSeedSync(SEED_PHRASE)))
+
+      const account = await wallet.getAccount(0)
 
       expect(account.path).toBe("m/44'/195'/0'/0/0")
       expect(await account.getAddress()).toBe(ACCOUNT_0_ADDRESS)

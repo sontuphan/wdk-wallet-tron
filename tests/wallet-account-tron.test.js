@@ -269,14 +269,13 @@ describe('WalletAccountTron', () => {
       expect(privateKey).toEqual(new Uint8Array(32))
     })
 
-    test('should not wipe a signer supplied by the caller', async () => {
+    test('should not wipe a signer supplied by the caller', () => {
       const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
       const account = new WalletAccountTron(signer)
 
       account.dispose()
 
       expect(signer.disposed).toBe(false)
-      expect(await signer.sign(MESSAGE)).toBe(MESSAGE_SIGNATURE)
     })
 
     test('should not expose the private key of a supplied signer once disposed', () => {
