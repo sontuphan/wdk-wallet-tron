@@ -229,17 +229,12 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
       throw new ProviderRequiredError('The wallet must be connected to tron web to sign transactions.')
     }
 
-    const isPrebuilt = WalletAccountReadOnlyTron._isPrebuiltTransaction(tx)
-
-    const transaction = await this._buildTransaction(tx)
-
-    await this._assertTransactionOwner(transaction, isPrebuilt)
+    const transaction = await this._buildOwnTransaction(tx)
 
     if (this._config.transactionMaxFee !== undefined) {
       const { fee } = await this._quoteTransaction(transaction)
-      if (BigInt(fee) > BigInt(this._config.transactionMaxFee)) {
-        throw new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.')
-      }
+
+      this._assertFeeWithinLimit(fee, this._config.transactionMaxFee, 'Exceeded maximum fee cost for transaction operation.')
     }
 
     return await this._signTransaction(transaction)
@@ -273,23 +268,13 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
       throw new ProviderRequiredError('The wallet must be connected to tron web to send transactions.')
     }
 
-    let signedTransaction = tx
-
-    if (!tx.signature) {
-      const isPrebuilt = WalletAccountReadOnlyTron._isPrebuiltTransaction(tx)
-
-      const transaction = await this._buildTransaction(tx)
-
-      await this._assertTransactionOwner(transaction, isPrebuilt)
-
-      signedTransaction = await this._signTransaction(transaction)
-    }
+    const signedTransaction = tx.signature
+      ? tx
+      : await this._signTransaction(await this._buildOwnTransaction(tx))
 
     const { fee, activationFee } = await this.quoteSendTransaction(signedTransaction)
 
-    if (this._config.transactionMaxFee !== undefined && BigInt(fee) > BigInt(this._config.transactionMaxFee)) {
-      throw new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.')
-    }
+    this._assertFeeWithinLimit(fee, this._config.transactionMaxFee, 'Exceeded maximum fee cost for transaction operation.')
 
     const { txid } = await this._tronWeb.trx.sendRawTransaction(signedTransaction)
 
@@ -343,9 +328,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
     const { fee } = await this.quoteTransfer({ token, recipient, amount })
 
-    if (this._config.transferMaxFee !== undefined && fee > BigInt(this._config.transferMaxFee)) {
-      throw new MaximumFeeExceededError('Exceeded maximum fee cost for transfer operations.')
-    }
+    this._assertFeeWithinLimit(fee, this._config.transferMaxFee, 'Exceeded maximum fee cost for transfer operations.')
 
     const address = await this.getAddress()
     const addressHex = this._tronWeb.address.toHex(address)
@@ -434,5 +417,23 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
   /** @private */
   async _signTransaction (transaction) {
     return await this._signer.signTransaction(transaction)
+  }
+
+  /** @private */
+  async _buildOwnTransaction (tx) {
+    const isPrebuilt = WalletAccountReadOnlyTron._isPrebuiltTransaction(tx)
+
+    const transaction = await this._buildTransaction(tx)
+
+    await this._assertTransactionOwner(transaction, isPrebuilt)
+
+    return transaction
+  }
+
+  /** @private */
+  _assertFeeWithinLimit (fee, maxFee, message) {
+    if (maxFee !== undefined && BigInt(fee) > BigInt(maxFee)) {
+      throw new MaximumFeeExceededError(message)
+    }
   }
 }

@@ -160,6 +160,10 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
     dispose(): void;
     /** @private */
     private _signTransaction;
+    /** @private */
+    private _buildOwnTransaction;
+    /** @private */
+    private _assertFeeWithinLimit;
 }
 export type IWalletAccount<TSignedTransaction> = import("@tetherto/wdk-wallet").IWalletAccount<TSignedTransaction>;
 export type KeyPair = import("@tetherto/wdk-wallet").KeyPair;
