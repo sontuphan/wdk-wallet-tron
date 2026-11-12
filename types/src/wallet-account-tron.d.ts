@@ -1,16 +1,6 @@
 /** @implements {IWalletAccount<TronSignedTransaction>} */
 export default class WalletAccountTron extends WalletAccountReadOnlyTron implements IWalletAccount<TronSignedTransaction> {
     /**
-     * Creates a new tron wallet account from a raw private key. The account owns the signer it creates
-     * and wipes it on {@link dispose}.
-     *
-     * @param {string | Uint8Array} privateKey - The raw private key (hex string with or without 0x, or 32 bytes).
-     * @param {TronWalletConfig} [config] - The configuration object.
-     * @returns {WalletAccountTron} The wallet account.
-     * @throws {ValueError} If the private key is not valid.
-     */
-    static fromPrivateKey(privateKey: string | Uint8Array, config?: TronWalletConfig): WalletAccountTron;
-    /**
      * Creates a new tron wallet account from a signer.
      *
      * @overload
@@ -41,23 +31,15 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      */
     constructor(seed: string | Uint8Array, config?: TronWalletConfig);
     /**
-     * The tron wallet account configuration.
+     * Creates a new tron wallet account from a raw private key. The account owns the signer it creates
+     * and wipes it on {@link dispose}.
      *
-     * @protected
-     * @type {TronWalletConfig}
+     * @param {string | Uint8Array} privateKey - The raw private key (hex string with or without 0x, or 32 bytes).
+     * @param {TronWalletConfig} [config] - The configuration object.
+     * @returns {WalletAccountTron} The wallet account.
+     * @throws {ValueError} If the private key is not valid.
      */
-    protected _config: TronWalletConfig;
-    /** @private */
-    private _signer;
-    /**
-     * If true, disposes the signer on calls to the 'dispose' method.
-     *
-     * @protected
-     * @type {boolean}
-     */
-    protected _shouldWipeSignerOnDisposal: boolean;
-    /** @private */
-    private _disposed;
+    static fromPrivateKey(privateKey: string | Uint8Array, config?: TronWalletConfig): WalletAccountTron;
     /**
      * True if the wallet account has been disposed.
      *
@@ -120,10 +102,6 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     sendTransaction(tx: TronTransaction | TronSignedTransaction): Promise<TransactionResult & TronActivationFee>;
-    /** @private */
-    private _assertTransactionOwner;
-    /** @private */
-    private _isConsistentTransaction;
     /**
      * Transfers a TRC-20 token to another address.
      * TRC-20 transfers do not incur an account activation fee.
@@ -158,6 +136,28 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * again has no effect.
      */
     dispose(): void;
+    /**
+     * The tron wallet account configuration.
+     *
+     * @protected
+     * @type {TronWalletConfig}
+     */
+    protected _config: TronWalletConfig;
+    /**
+     * If true, disposes the signer on calls to the 'dispose' method.
+     *
+     * @protected
+     * @type {boolean}
+     */
+    protected _shouldWipeSignerOnDisposal: boolean;
+    /** @private */
+    private _signer;
+    /** @private */
+    private _disposed;
+    /** @private */
+    private _assertTransactionOwner;
+    /** @private */
+    private _isConsistentTransaction;
     /** @private */
     private _signTransaction;
     /** @private */

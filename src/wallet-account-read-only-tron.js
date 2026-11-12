@@ -145,29 +145,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
   }
 
   /**
-   * Returns whether a transaction is an already-built tron web transaction
-   * (as returned by `tronWeb.transactionBuilder.*`).
-   *
-   * @protected
-   * @param {TronTransaction} tx - The transaction.
-   * @returns {boolean} True if the transaction is a pre-built tron web transaction.
-   */
-  static _isPrebuiltTransaction (tx) {
-    return !!tx.txID
-  }
-
-  /**
-   * Returns whether a transaction is a smart contract call descriptor.
-   *
-   * @protected
-   * @param {TronTransaction} tx - The transaction.
-   * @returns {boolean} True if the transaction is a smart contract call.
-   */
-  static _isSmartContractCall (tx) {
-    return !!tx.functionSelector
-  }
-
-  /**
    * Verifies a message's signature.
    *
    * @param {string} message - The original message.
@@ -264,6 +241,229 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
     const transaction = await this._buildTransaction(tx)
 
     return await this._quoteTransaction(transaction)
+  }
+
+  /**
+   * Quotes the costs of TRC-20 transfer operation.
+   * TRC-20 transfers do not incur an account activation fee.
+   *
+   * @param {TransferOptions} options - The transfer's options.
+   * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+   * @throws {TransferError} If the account's token balance is below the transfer amount.
+   */
+  async quoteTransfer ({ token, recipient, amount }) {
+    if (!this._tronWeb) {
+      throw new ProviderRequiredError('The wallet must be connected to tron web to quote transfer operations.')
+    }
+
+    const address = await this.getAddress()
+    const addressHex = this._tronWeb.address.toHex(address)
+
+    const parameters = [
+      { type: 'address', value: this._tronWeb.address.toHex(recipient) },
+      { type: 'uint256', value: amount }
+    ]
+
+    let simulation
+    try {
+      simulation = await this._tronWeb.transactionBuilder
+        .triggerConstantContract(token, 'transfer(address,uint256)', {}, parameters, addressHex)
+    } catch (error) {
+      if (error.message?.includes('REVERT')) {
+        const balance = await this.getTokenBalance(token)
+        if (balance < BigInt(amount)) {
+          throw new TransferError('Insufficient token balance for the transfer.', {
+            reason: TransferErrorReason.INSUFFICIENT_TOKEN_BALANCE,
+            cause: error
+          })
+        }
+      }
+
+      throw error
+    }
+
+    return {
+      fee: await this._estimateContractFee(simulation)
+    }
+  }
+
+  /**
+   * Returns a transaction's receipt.
+   *
+   * @deprecated Use {@link getTransaction} instead, which returns a normalized, finality-based receipt. The raw tron receipt remains available on its `receipt` property.
+   * @param {string} hash - The transaction's hash.
+   * @returns {Promise<TronTransactionReceipt | null>} The receipt, or null if the transaction has not been included in a block yet.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+   */
+  async getTransactionReceipt (hash) {
+    if (!this._tronWeb) {
+      throw new ProviderRequiredError('The wallet must be connected to tron web to fetch transaction receipts.')
+    }
+
+    const receipt = await this._tronWeb.trx.getTransactionInfo(hash)
+
+    if (!receipt || Object.keys(receipt).length === 0) {
+      return null
+    }
+
+    return receipt
+  }
+
+  /**
+   * Returns a normalized, finality-based receipt for a transaction.
+   *
+   * A transaction included in a block is `confirmed`; once its block has been
+   * solidified (irreversible) it becomes `final`.
+   *
+   * @param {string} hash - The transaction's hash.
+   * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The normalized receipt.
+   * @throws {ValueError} If the hash is not a valid transaction id.
+   * @throws {NoSuchElementError} If no transaction has been found for the given hash.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+   */
+  async getTransaction (hash) {
+    if (!this._tronWeb) {
+      throw new ProviderRequiredError('The wallet must be connected to tron web to fetch transactions.')
+    }
+
+    if (!/^(0x)?[0-9a-fA-F]{64}$/.test(hash.trim())) {
+      throw new ValueError(`Invalid transaction id: '${hash}'.`)
+    }
+
+    const txid = hash.trim()
+
+    const receipt = await this._tronWeb.trx.getUnconfirmedTransactionInfo(txid)
+
+    if (!receipt || Object.keys(receipt).length === 0) {
+      throw new NoSuchElementError(`No transaction found for '${txid}'.`)
+    }
+
+    const blockNumber = receipt.blockNumber ?? null
+
+    if (blockNumber === null) {
+      return {
+        hash: txid,
+        finality: 'pending',
+        confirmations: null,
+        receipt: null
+      }
+    }
+
+    const solidifiedBlock = await this._getSolidifiedBlockNumber()
+
+    const confirmations = solidifiedBlock !== null
+      ? Math.max(0, solidifiedBlock - blockNumber + 1)
+      : null
+
+    const isFinal = solidifiedBlock !== null && blockNumber <= solidifiedBlock
+
+    return {
+      hash: txid,
+      finality: isFinal ? 'final' : 'confirmed',
+      success: this._isTransactionSuccessful(receipt),
+      block: blockNumber,
+      fee: receipt.fee != null ? BigInt(receipt.fee) : undefined,
+      confirmations,
+      receipt
+    }
+  }
+
+  /**
+   * Blocks until a transaction reaches a terminal state (the requested finality target or `dropped`), or times out.
+   *
+   * @param {string} hash - The transaction's hash.
+   * @param {WaitForTransactionOptions} [options] - The wait options.
+   * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The terminal receipt: the finality target reached (inspect `success` to tell success from revert), or `dropped`.
+   * @throws {TimeoutError} If the target is not reached before the timeout.
+   */
+  async waitForTransaction (hash, options = {}) {
+    return await super.waitForTransaction(hash, options)
+  }
+
+  /**
+   * Overrides the base default to allow for slower tron inclusion and solidification.
+   *
+   * @type {number}
+   */
+  get defaultWaitTimeout () {
+    return DEFAULT_WAIT_TIMEOUT_MS
+  }
+
+  /**
+   * Initializes the tron web provider with optional failover support.
+   *
+   * @param {Omit<TronWalletConfig, 'transferMaxFee' | 'transactionMaxFee'>} config - The read-only wallet account configuration.
+   * @returns {TronWeb | undefined} The initialized tron web provider.
+   */
+  static initializeProvider (config) {
+    const { provider, retries = 3 } = config
+
+    let tronWeb
+
+    if (Array.isArray(provider)) {
+      if (!provider.length) {
+        throw new Error("The 'provider' option cannot be set to an empty list.")
+      }
+
+      const fullNodeFailover = new FailoverProvider({ retries })
+      const solidityNodeFailover = new FailoverProvider({ retries })
+      const eventServerFailover = new FailoverProvider({ retries })
+
+      const clients = provider.map((entry) => {
+        if (typeof entry === 'string') {
+          return new TronWeb({ fullHost: entry })
+        }
+
+        if (!tronWeb) tronWeb = entry
+        return entry
+      })
+
+      for (const client of clients) {
+        fullNodeFailover.addProvider(client.fullNode)
+        solidityNodeFailover.addProvider(client.solidityNode)
+        eventServerFailover.addProvider(client.eventServer)
+      }
+
+      const fullNode = fullNodeFailover.initialize()
+      const solidityNode = solidityNodeFailover.initialize()
+      const eventServer = eventServerFailover.initialize()
+
+      if (!tronWeb) return new TronWeb({ fullNode, solidityNode, eventServer })
+
+      tronWeb.setFullNode(fullNode)
+      tronWeb.setSolidityNode(solidityNode)
+      tronWeb.setEventServer(eventServer)
+
+      return tronWeb
+    }
+
+    return typeof provider === 'string'
+      ? new TronWeb({ fullHost: provider })
+      : provider
+  }
+
+  /**
+   * Returns whether a transaction is an already-built tron web transaction
+   * (as returned by `tronWeb.transactionBuilder.*`).
+   *
+   * @protected
+   * @param {TronTransaction} tx - The transaction.
+   * @returns {boolean} True if the transaction is a pre-built tron web transaction.
+   */
+  static _isPrebuiltTransaction (tx) {
+    return !!tx.txID
+  }
+
+  /**
+   * Returns whether a transaction is a smart contract call descriptor.
+   *
+   * @protected
+   * @param {TronTransaction} tx - The transaction.
+   * @returns {boolean} True if the transaction is a smart contract call.
+   */
+  static _isSmartContractCall (tx) {
+    return !!tx.functionSelector
   }
 
   /**
@@ -397,51 +597,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
   }
 
   /**
-   * Quotes the costs of TRC-20 transfer operation.
-   * TRC-20 transfers do not incur an account activation fee.
-   *
-   * @param {TransferOptions} options - The transfer's options.
-   * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
-   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   * @throws {TransferError} If the account's token balance is below the transfer amount.
-   */
-  async quoteTransfer ({ token, recipient, amount }) {
-    if (!this._tronWeb) {
-      throw new ProviderRequiredError('The wallet must be connected to tron web to quote transfer operations.')
-    }
-
-    const address = await this.getAddress()
-    const addressHex = this._tronWeb.address.toHex(address)
-
-    const parameters = [
-      { type: 'address', value: this._tronWeb.address.toHex(recipient) },
-      { type: 'uint256', value: amount }
-    ]
-
-    let simulation
-    try {
-      simulation = await this._tronWeb.transactionBuilder
-        .triggerConstantContract(token, 'transfer(address,uint256)', {}, parameters, addressHex)
-    } catch (error) {
-      if (error.message?.includes('REVERT')) {
-        const balance = await this.getTokenBalance(token)
-        if (balance < BigInt(amount)) {
-          throw new TransferError('Insufficient token balance for the transfer.', {
-            reason: TransferErrorReason.INSUFFICIENT_TOKEN_BALANCE,
-            cause: error
-          })
-        }
-      }
-
-      throw error
-    }
-
-    return {
-      fee: await this._estimateContractFee(simulation)
-    }
-  }
-
-  /**
    * Estimates the energy and bandwidth fee of a smart contract call from a
    * constant contract simulation result.
    *
@@ -466,99 +621,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
     const bandwidthCost = await this._getBandwidthCost(transaction, { isActivation: false, resources })
 
     return totalEnergyCost + bandwidthCost
-  }
-
-  /**
-   * Returns a transaction's receipt.
-   *
-   * @deprecated Use {@link getTransaction} instead, which returns a normalized, finality-based receipt. The raw tron receipt remains available on its `receipt` property.
-   * @param {string} hash - The transaction's hash.
-   * @returns {Promise<TronTransactionReceipt | null>} The receipt, or null if the transaction has not been included in a block yet.
-   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   */
-  async getTransactionReceipt (hash) {
-    if (!this._tronWeb) {
-      throw new ProviderRequiredError('The wallet must be connected to tron web to fetch transaction receipts.')
-    }
-
-    const receipt = await this._tronWeb.trx.getTransactionInfo(hash)
-
-    if (!receipt || Object.keys(receipt).length === 0) {
-      return null
-    }
-
-    return receipt
-  }
-
-  /**
-   * Returns a normalized, finality-based receipt for a transaction.
-   *
-   * A transaction included in a block is `confirmed`; once its block has been
-   * solidified (irreversible) it becomes `final`.
-   *
-   * @param {string} hash - The transaction's hash.
-   * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The normalized receipt.
-   * @throws {ValueError} If the hash is not a valid transaction id.
-   * @throws {NoSuchElementError} If no transaction has been found for the given hash.
-   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   */
-  async getTransaction (hash) {
-    if (!this._tronWeb) {
-      throw new ProviderRequiredError('The wallet must be connected to tron web to fetch transactions.')
-    }
-
-    if (!/^(0x)?[0-9a-fA-F]{64}$/.test(hash.trim())) {
-      throw new ValueError(`Invalid transaction id: '${hash}'.`)
-    }
-
-    const txid = hash.trim()
-
-    const receipt = await this._tronWeb.trx.getUnconfirmedTransactionInfo(txid)
-
-    if (!receipt || Object.keys(receipt).length === 0) {
-      throw new NoSuchElementError(`No transaction found for '${txid}'.`)
-    }
-
-    const blockNumber = receipt.blockNumber ?? null
-
-    if (blockNumber === null) {
-      return {
-        hash: txid,
-        finality: 'pending',
-        confirmations: null,
-        receipt: null
-      }
-    }
-
-    const solidifiedBlock = await this._getSolidifiedBlockNumber()
-
-    const confirmations = solidifiedBlock !== null
-      ? Math.max(0, solidifiedBlock - blockNumber + 1)
-      : null
-
-    const isFinal = solidifiedBlock !== null && blockNumber <= solidifiedBlock
-
-    return {
-      hash: txid,
-      finality: isFinal ? 'final' : 'confirmed',
-      success: this._isTransactionSuccessful(receipt),
-      block: blockNumber,
-      fee: receipt.fee != null ? BigInt(receipt.fee) : undefined,
-      confirmations,
-      receipt
-    }
-  }
-
-  /**
-   * Blocks until a transaction reaches a terminal state (the requested finality target or `dropped`), or times out.
-   *
-   * @param {string} hash - The transaction's hash.
-   * @param {WaitForTransactionOptions} [options] - The wait options.
-   * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The terminal receipt: the finality target reached (inspect `success` to tell success from revert), or `dropped`.
-   * @throws {TimeoutError} If the target is not reached before the timeout.
-   */
-  async waitForTransaction (hash, options = {}) {
-    return await super.waitForTransaction(hash, options)
   }
 
   /**
@@ -594,15 +656,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
   }
 
   /**
-   * Overrides the base default to allow for slower tron inclusion and solidification.
-   *
-   * @type {number}
-   */
-  get defaultWaitTimeout () {
-    return DEFAULT_WAIT_TIMEOUT_MS
-  }
-
-  /**
    * Returns the bandwidth cost of a tron web's transaction.
    *
    * @protected
@@ -635,58 +688,5 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
     }
 
     return txSizeInBytes * BANDWIDTH_PRICE
-  }
-
-  /**
-   * Initializes the tron web provider with optional failover support.
-   *
-   * @param {Omit<TronWalletConfig, 'transferMaxFee' | 'transactionMaxFee'>} config - The read-only wallet account configuration.
-   * @returns {TronWeb | undefined} The initialized tron web provider.
-   */
-  static initializeProvider (config) {
-    const { provider, retries = 3 } = config
-
-    let tronWeb
-
-    if (Array.isArray(provider)) {
-      if (!provider.length) {
-        throw new Error("The 'provider' option cannot be set to an empty list.")
-      }
-
-      const fullNodeFailover = new FailoverProvider({ retries })
-      const solidityNodeFailover = new FailoverProvider({ retries })
-      const eventServerFailover = new FailoverProvider({ retries })
-
-      const clients = provider.map((entry) => {
-        if (typeof entry === 'string') {
-          return new TronWeb({ fullHost: entry })
-        }
-
-        if (!tronWeb) tronWeb = entry
-        return entry
-      })
-
-      for (const client of clients) {
-        fullNodeFailover.addProvider(client.fullNode)
-        solidityNodeFailover.addProvider(client.solidityNode)
-        eventServerFailover.addProvider(client.eventServer)
-      }
-
-      const fullNode = fullNodeFailover.initialize()
-      const solidityNode = solidityNodeFailover.initialize()
-      const eventServer = eventServerFailover.initialize()
-
-      if (!tronWeb) return new TronWeb({ fullNode, solidityNode, eventServer })
-
-      tronWeb.setFullNode(fullNode)
-      tronWeb.setSolidityNode(solidityNode)
-      tronWeb.setEventServer(eventServer)
-
-      return tronWeb
-    }
-
-    return typeof provider === 'string'
-      ? new TronWeb({ fullHost: provider })
-      : provider
   }
 }

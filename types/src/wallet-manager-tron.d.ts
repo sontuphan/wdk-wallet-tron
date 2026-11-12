@@ -41,27 +41,6 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      */
     constructor(seed: string | Uint8Array, config?: TronWalletConfig);
     /**
-     * If true, disposes the default signer on calls to the 'dispose' method.
-     *
-     * @protected
-     * @type {boolean}
-     */
-    protected _shouldWipeDefaultSignerOnDisposal: boolean;
-    /**
-     * The tron wallet configuration.
-     *
-     * @protected
-     * @type {TronWalletConfig}
-     */
-    protected _config: TronWalletConfig;
-    /**
-     * The tron web client.
-     *
-     * @protected
-     * @type {ReturnType<typeof WalletAccountTron.initializeProvider>}
-     */
-    protected _tronWeb: ReturnType<typeof WalletAccountTron.initializeProvider>;
-    /**
      * Returns the wallet account at a specific index (see BIP-44).
      *
      * **Warning:** derivation is relative to the signer's own path. If the signer sits at a leaf
@@ -112,8 +91,6 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @throws {DisposalError} If the wallet manager or the signer has been disposed.
      */
     getAccountByPath(path: string, options?: AccountOptions): Promise<WalletAccountTron>;
-    /** @private */
-    private _accountConfig;
     /**
      * Disposes all wallet accounts, and the default signer if the manager built it from a seed.
      * A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed. Calling it again has
@@ -127,6 +104,29 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     getFeeRates(): Promise<FeeRates>;
+    /**
+     * If true, disposes the default signer on calls to the 'dispose' method.
+     *
+     * @protected
+     * @type {boolean}
+     */
+    protected _shouldWipeDefaultSignerOnDisposal: boolean;
+    /**
+     * The tron wallet configuration.
+     *
+     * @protected
+     * @type {TronWalletConfig}
+     */
+    protected _config: TronWalletConfig;
+    /**
+     * The tron web client.
+     *
+     * @protected
+     * @type {ReturnType<typeof WalletAccountTron.initializeProvider>}
+     */
+    protected _tronWeb: ReturnType<typeof WalletAccountTron.initializeProvider>;
+    /** @private */
+    private _accountConfig;
 }
 export type FeeRates = import("@tetherto/wdk-wallet").FeeRates;
 export type TronWalletConfig = import("./wallet-account-tron.js").TronWalletConfig;

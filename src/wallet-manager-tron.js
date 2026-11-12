@@ -142,7 +142,6 @@ export default class WalletManagerTron extends WalletManager {
    * @throws {NoSuchElementError} If no signer is registered with the given name.
    * @throws {DisposalError} If the wallet manager or the given signer has been disposed.
    */
-
   async getAccount (indexOrSignerName = 0, options = {}) {
     if (typeof indexOrSignerName === 'string') {
       const signerName = indexOrSignerName
@@ -212,11 +211,6 @@ export default class WalletManagerTron extends WalletManager {
     return this._accounts[key]
   }
 
-  /** @private */
-  _accountConfig () {
-    return { ...this._config, provider: this._tronWeb }
-  }
-
   /**
    * Disposes all wallet accounts, and the default signer if the manager built it from a seed.
    * A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed. Calling it again has
@@ -253,5 +247,10 @@ export default class WalletManagerTron extends WalletManager {
       normal: (fee * WalletManagerTron._FEE_RATE_NORMAL_MULTIPLIER) / 100n,
       fast: (fee * WalletManagerTron._FEE_RATE_FAST_MULTIPLIER) / 100n
     }
+  }
+
+  /** @private */
+  _accountConfig () {
+    return { ...this._config, provider: this._tronWeb }
   }
 }

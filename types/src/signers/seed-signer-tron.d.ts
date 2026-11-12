@@ -26,16 +26,6 @@ export default class SeedSignerTron implements ISignerTron {
      * @see https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
      */
     constructor(seed: string | Uint8Array, path?: string);
-    /** @private */
-    private _init;
-    /** @private */
-    private _node;
-    /** @private */
-    private _path;
-    /** @private */
-    private _address;
-    /** @private */
-    private _disposed;
     /**
      * Whether the signer supports account derivation via {@link derive}.
      *
@@ -100,6 +90,16 @@ export default class SeedSignerTron implements ISignerTron {
      * Disposes the signer, securely erasing its private key and chain code from memory.
      */
     dispose(): void;
+    /** @private */
+    private _init;
+    /** @private */
+    private _node;
+    /** @private */
+    private _path;
+    /** @private */
+    private _address;
+    /** @private */
+    private _disposed;
 }
 export type ISignerTron = import("./signer-tron.js").ISignerTron;
 export type KeyPair = import("@tetherto/wdk-wallet").KeyPair;

@@ -7,37 +7,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      */
     constructor(address: string, config?: Omit<TronWalletConfig, "transferMaxFee" | "transactionMaxFee">);
     /**
-     * The read-only wallet account configuration.
-     *
-     * @protected
-     * @type {Omit<TronWalletConfig, "transferMaxFee" | "transactionMaxFee">}
-     */
-    protected _config: Omit<TronWalletConfig, "transferMaxFee" | "transactionMaxFee">;
-    /**
-     * The tron web client.
-     *
-     * @protected
-     * @type {TronWeb | undefined}
-     */
-    protected _tronWeb: TronWeb | undefined;
-    /**
-     * Returns whether a transaction is an already-built tron web transaction
-     * (as returned by `tronWeb.transactionBuilder.*`).
-     *
-     * @protected
-     * @param {TronTransaction} tx - The transaction.
-     * @returns {boolean} True if the transaction is a pre-built tron web transaction.
-     */
-    protected static _isPrebuiltTransaction(tx: TronTransaction): boolean;
-    /**
-     * Returns whether a transaction is a smart contract call descriptor.
-     *
-     * @protected
-     * @param {TronTransaction} tx - The transaction.
-     * @returns {boolean} True if the transaction is a smart contract call.
-     */
-    protected static _isSmartContractCall(tx: TronTransaction): boolean;
-    /**
      * Verifies a message's signature.
      *
      * @param {string} message - The original message.
@@ -78,6 +47,91 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     quoteSendTransaction(tx: TronTransaction): Promise<Omit<TransactionResult, "hash"> & TronActivationFee>;
+    /**
+     * Quotes the costs of TRC-20 transfer operation.
+     * TRC-20 transfers do not incur an account activation fee.
+     *
+     * @param {TransferOptions} options - The transfer's options.
+     * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     * @throws {TransferError} If the account's token balance is below the transfer amount.
+     */
+    quoteTransfer(options: TransferOptions): Promise<Omit<TransferResult, "hash">>;
+    /**
+     * Returns a transaction's receipt.
+     *
+     * @deprecated Use {@link getTransaction} instead, which returns a normalized, finality-based receipt. The raw tron receipt remains available on its `receipt` property.
+     * @param {string} hash - The transaction's hash.
+     * @returns {Promise<TronTransactionReceipt | null>} The receipt, or null if the transaction has not been included in a block yet.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     */
+    getTransactionReceipt(hash: string): Promise<TronTransactionReceipt | null>;
+    /**
+     * Returns a normalized, finality-based receipt for a transaction.
+     *
+     * A transaction included in a block is `confirmed`; once its block has been
+     * solidified (irreversible) it becomes `final`.
+     *
+     * @param {string} hash - The transaction's hash.
+     * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The normalized receipt.
+     * @throws {ValueError} If the hash is not a valid transaction id.
+     * @throws {NoSuchElementError} If no transaction has been found for the given hash.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     */
+    getTransaction(hash: string): Promise<TransactionReceipt & TronTransactionDetails>;
+    /**
+     * Blocks until a transaction reaches a terminal state (the requested finality target or `dropped`), or times out.
+     *
+     * @param {string} hash - The transaction's hash.
+     * @param {WaitForTransactionOptions} [options] - The wait options.
+     * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The terminal receipt: the finality target reached (inspect `success` to tell success from revert), or `dropped`.
+     * @throws {TimeoutError} If the target is not reached before the timeout.
+     */
+    waitForTransaction(hash: string, options?: WaitForTransactionOptions): Promise<TransactionReceipt & TronTransactionDetails>;
+    /**
+     * Overrides the base default to allow for slower tron inclusion and solidification.
+     *
+     * @type {number}
+     */
+    get defaultWaitTimeout(): number;
+    /**
+     * Initializes the tron web provider with optional failover support.
+     *
+     * @param {Omit<TronWalletConfig, 'transferMaxFee' | 'transactionMaxFee'>} config - The read-only wallet account configuration.
+     * @returns {TronWeb | undefined} The initialized tron web provider.
+     */
+    static initializeProvider(config: Omit<TronWalletConfig, "transferMaxFee" | "transactionMaxFee">): TronWeb | undefined;
+    /**
+     * The read-only wallet account configuration.
+     *
+     * @protected
+     * @type {Omit<TronWalletConfig, "transferMaxFee" | "transactionMaxFee">}
+     */
+    protected _config: Omit<TronWalletConfig, "transferMaxFee" | "transactionMaxFee">;
+    /**
+     * The tron web client.
+     *
+     * @protected
+     * @type {TronWeb | undefined}
+     */
+    protected _tronWeb: TronWeb | undefined;
+    /**
+     * Returns whether a transaction is an already-built tron web transaction
+     * (as returned by `tronWeb.transactionBuilder.*`).
+     *
+     * @protected
+     * @param {TronTransaction} tx - The transaction.
+     * @returns {boolean} True if the transaction is a pre-built tron web transaction.
+     */
+    protected static _isPrebuiltTransaction(tx: TronTransaction): boolean;
+    /**
+     * Returns whether a transaction is a smart contract call descriptor.
+     *
+     * @protected
+     * @param {TronTransaction} tx - The transaction.
+     * @returns {boolean} True if the transaction is a smart contract call.
+     */
+    protected static _isSmartContractCall(tx: TronTransaction): boolean;
     /**
      * Builds an unsigned tron web transaction from the given transaction.
      *
@@ -131,16 +185,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      */
     protected _netEnergyCost(energyUsed: number, energyPrice: number, resources: AccountResourceMessage): bigint;
     /**
-     * Quotes the costs of TRC-20 transfer operation.
-     * TRC-20 transfers do not incur an account activation fee.
-     *
-     * @param {TransferOptions} options - The transfer's options.
-     * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
-     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-     * @throws {TransferError} If the account's token balance is below the transfer amount.
-     */
-    quoteTransfer(options: TransferOptions): Promise<Omit<TransferResult, "hash">>;
-    /**
      * Estimates the energy and bandwidth fee of a smart contract call from a
      * constant contract simulation result.
      *
@@ -154,37 +198,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
         transaction: Transaction;
         energy_used?: number;
     }): Promise<bigint>;
-    /**
-     * Returns a transaction's receipt.
-     *
-     * @deprecated Use {@link getTransaction} instead, which returns a normalized, finality-based receipt. The raw tron receipt remains available on its `receipt` property.
-     * @param {string} hash - The transaction's hash.
-     * @returns {Promise<TronTransactionReceipt | null>} The receipt, or null if the transaction has not been included in a block yet.
-     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-     */
-    getTransactionReceipt(hash: string): Promise<TronTransactionReceipt | null>;
-    /**
-     * Returns a normalized, finality-based receipt for a transaction.
-     *
-     * A transaction included in a block is `confirmed`; once its block has been
-     * solidified (irreversible) it becomes `final`.
-     *
-     * @param {string} hash - The transaction's hash.
-     * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The normalized receipt.
-     * @throws {ValueError} If the hash is not a valid transaction id.
-     * @throws {NoSuchElementError} If no transaction has been found for the given hash.
-     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-     */
-    getTransaction(hash: string): Promise<TransactionReceipt & TronTransactionDetails>;
-    /**
-     * Blocks until a transaction reaches a terminal state (the requested finality target or `dropped`), or times out.
-     *
-     * @param {string} hash - The transaction's hash.
-     * @param {WaitForTransactionOptions} [options] - The wait options.
-     * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The terminal receipt: the finality target reached (inspect `success` to tell success from revert), or `dropped`.
-     * @throws {TimeoutError} If the target is not reached before the timeout.
-     */
-    waitForTransaction(hash: string, options?: WaitForTransactionOptions): Promise<TransactionReceipt & TronTransactionDetails>;
     /**
      * Returns whether a committed transaction executed successfully.
      *
@@ -201,12 +214,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      */
     protected _getSolidifiedBlockNumber(): Promise<number | null>;
     /**
-     * Overrides the base default to allow for slower tron inclusion and solidification.
-     *
-     * @type {number}
-     */
-    get defaultWaitTimeout(): number;
-    /**
      * Returns the bandwidth cost of a tron web's transaction.
      *
      * @protected
@@ -215,13 +222,6 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @returns {Promise<bigint>} The bandwidth cost in SUN.
      */
     protected _getBandwidthCost(transaction: Transaction, options?: TronBandwidthCostOptions): Promise<bigint>;
-    /**
-     * Initializes the tron web provider with optional failover support.
-     *
-     * @param {Omit<TronWalletConfig, 'transferMaxFee' | 'transactionMaxFee'>} config - The read-only wallet account configuration.
-     * @returns {TronWeb | undefined} The initialized tron web provider.
-     */
-    static initializeProvider(config: Omit<TronWalletConfig, "transferMaxFee" | "transactionMaxFee">): TronWeb | undefined;
 }
 export type Transaction = import("tronweb").Types.Transaction;
 export type TronTransactionReceipt = import("tronweb").Types.TransactionInfo;

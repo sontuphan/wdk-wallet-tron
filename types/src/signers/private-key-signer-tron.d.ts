@@ -16,14 +16,6 @@ export default class PrivateKeySignerTron implements ISignerTron {
      * @throws {ValueError} If the key is not a valid secp256k1 private key.
      */
     constructor(privateKey: string | Uint8Array);
-    /** @private */
-    private _rawPrivateKey;
-    /** @private */
-    private _rawPublicKey;
-    /** @private */
-    private _address;
-    /** @private */
-    private _disposed;
     /**
      * Whether the signer supports account derivation via {@link derive}.
      *
@@ -86,6 +78,14 @@ export default class PrivateKeySignerTron implements ISignerTron {
      * Disposes the signer, securely erasing its internal copy of the private key from memory.
      */
     dispose(): void;
+    /** @private */
+    private _rawPrivateKey;
+    /** @private */
+    private _rawPublicKey;
+    /** @private */
+    private _address;
+    /** @private */
+    private _disposed;
 }
 export type ISignerTron = import("./signer-tron.js").ISignerTron;
 export type KeyPair = import("@tetherto/wdk-wallet").KeyPair;

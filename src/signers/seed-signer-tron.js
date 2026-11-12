@@ -129,21 +129,6 @@ export default class SeedSignerTron {
     this._init(path, deriveAndScrub(master, indexes))
   }
 
-  /** @private */
-  _init (path, node) {
-    /** @private */
-    this._node = node
-
-    /** @private */
-    this._path = path
-
-    /** @private */
-    this._address = getTronAddress(node.publicKey)
-
-    /** @private */
-    this._disposed = false
-  }
-
   /**
    * Whether the signer supports account derivation via {@link derive}.
    *
@@ -257,5 +242,20 @@ export default class SeedSignerTron {
     scrub(this._node)
 
     this._disposed = true
+  }
+
+  /** @private */
+  _init (path, node) {
+    /** @private */
+    this._node = node
+
+    /** @private */
+    this._path = path
+
+    /** @private */
+    this._address = getTronAddress(node.publicKey)
+
+    /** @private */
+    this._disposed = false
   }
 }

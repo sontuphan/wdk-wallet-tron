@@ -281,31 +281,6 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     return { hash: txid, fee, activationFee }
   }
 
-  /** @private */
-  async _assertTransactionOwner (transaction, isPrebuilt = false) {
-    if (isPrebuilt && !this._isConsistentTransaction(transaction)) {
-      throw new Error('The transaction id does not match its raw data.')
-    }
-
-    const address = await this.getAddress()
-    const ownerHex = this._tronWeb.address.toHex(address).toLowerCase()
-
-    const txOwner = transaction.raw_data?.contract?.[0]?.parameter?.value?.owner_address
-
-    if (txOwner?.toLowerCase() !== ownerHex) {
-      throw new Error('The transaction owner does not match the wallet account address.')
-    }
-  }
-
-  /** @private */
-  _isConsistentTransaction (transaction) {
-    try {
-      return this._tronWeb.utils.transaction.txCheck(transaction)
-    } catch {
-      return false
-    }
-  }
-
   /**
    * Transfers a TRC-20 token to another address.
    * TRC-20 transfers do not incur an account activation fee.
@@ -412,6 +387,31 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     }
 
     this._disposed = true
+  }
+
+  /** @private */
+  async _assertTransactionOwner (transaction, isPrebuilt = false) {
+    if (isPrebuilt && !this._isConsistentTransaction(transaction)) {
+      throw new Error('The transaction id does not match its raw data.')
+    }
+
+    const address = await this.getAddress()
+    const ownerHex = this._tronWeb.address.toHex(address).toLowerCase()
+
+    const txOwner = transaction.raw_data?.contract?.[0]?.parameter?.value?.owner_address
+
+    if (txOwner?.toLowerCase() !== ownerHex) {
+      throw new Error('The transaction owner does not match the wallet account address.')
+    }
+  }
+
+  /** @private */
+  _isConsistentTransaction (transaction) {
+    try {
+      return this._tronWeb.utils.transaction.txCheck(transaction)
+    } catch {
+      return false
+    }
   }
 
   /** @private */
