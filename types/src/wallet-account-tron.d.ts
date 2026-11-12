@@ -166,7 +166,6 @@ export type TronWalletConfig = import("./wallet-account-read-only-tron.js").Tron
 export type TronActivationFee = import("./wallet-account-read-only-tron.js").TronActivationFee;
 export type ISignerTron = import("./signers/signer-tron.js").ISignerTron;
 export type TronSignedTransaction = import("tronweb").Types.SignedTransaction;
-export type Transaction = import("tronweb").Types.Transaction;
 export type ApproveOptions = {
     /**
      * - The address of the token to approve.

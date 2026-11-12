@@ -38,7 +38,6 @@ import PrivateKeySignerTron from './signers/private-key-signer-tron.js'
 /** @typedef {import('./signers/signer-tron.js').ISignerTron} ISignerTron */
 
 /** @typedef {import('tronweb').Types.SignedTransaction} TronSignedTransaction */
-/** @typedef {import('tronweb').Types.Transaction} Transaction */
 
 /**
  * @typedef {Object} ApproveOptions
