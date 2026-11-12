@@ -188,10 +188,13 @@ describe('WalletAccountTron', () => {
       })
     })
 
-    test('should produce the same signature as the seed account', async () => {
-      const privateKeyAccount = WalletAccountTron.fromPrivateKey('0x' + ACCOUNT.keyPair.privateKey)
+    test('should accept a 0x-prefixed private key', () => {
+      const account = WalletAccountTron.fromPrivateKey('0x' + ACCOUNT.keyPair.privateKey)
 
-      expect(await privateKeyAccount.sign('Dummy message to sign.')).toBe(await account.sign('Dummy message to sign.'))
+      expect(account.keyPair).toEqual({
+        privateKey: new Uint8Array(Buffer.from(ACCOUNT.keyPair.privateKey, 'hex')),
+        publicKey: new Uint8Array(Buffer.from(ACCOUNT.keyPair.publicKey, 'hex'))
+      })
     })
 
     test('should wipe the signer it created on dispose', () => {
