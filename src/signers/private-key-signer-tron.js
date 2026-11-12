@@ -145,11 +145,11 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * Derives a child signer using a relative path.
+   * Always rejects: a private-key signer holds a single key and cannot derive child signers.
    *
-   * @param {string} path - The relative derivation path.
-   * @returns {Promise<never>} The derived signer.
-   * @throws {UnsupportedOperationError} If the signer does not support account derivation.
+   * @param {string} path - The relative derivation path (ignored).
+   * @returns {Promise<never>} A promise that always rejects.
+   * @throws {UnsupportedOperationError} Always, since the signer does not support account derivation.
    */
   async derive (path) {
     throw new UnsupportedOperationError('derive(path)')
