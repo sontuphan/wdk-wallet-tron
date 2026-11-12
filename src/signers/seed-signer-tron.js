@@ -22,7 +22,7 @@ import { sodium_memzero } from 'sodium-universal'
 
 import { DisposalError, ValueError } from '@tetherto/wdk-wallet'
 
-import { getTronAddress, parseDerivationPath, signMessage, signTransaction } from './utils.js'
+import { getTronAddress, parseDerivationPath, signMessage, signTransaction } from './signer-tron.js'
 
 /** @typedef {import('./signer-tron.js').ISignerTron} ISignerTron */
 /** @typedef {import('@tetherto/wdk-wallet').KeyPair} KeyPair */
