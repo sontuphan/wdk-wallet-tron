@@ -197,10 +197,9 @@ describe('WalletManagerTron', () => {
       wallet.addSigner('second', new SeedSignerTron(SECOND_SEED_PHRASE))
 
       const account = await wallet.getAccount(0, { signerName: 'second' })
-      const defaultAccount = await wallet.getAccount(0)
 
       expect(account.path).toBe("m/44'/195'/0'/0/0")
-      expect(await account.getAddress()).not.toBe(await defaultAccount.getAddress())
+      expect(await account.getAddress()).toBe('TELqMyNVc8Y7kAMpnmjxcQxk4Mb4BvvFjv')
       expect(await wallet.getAccountByPath("0'/0/0", { signerName: 'second' })).toBe(account)
     })
 

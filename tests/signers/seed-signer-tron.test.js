@@ -133,7 +133,10 @@ describe('SeedSignerTron', () => {
     test('should derive the same key as the constructor', async () => {
       const child = await new SeedSignerTron(SEED_PHRASE).derive("0'/0/0")
 
-      expect(child.keyPair).toEqual(new SeedSignerTron(SEED_PHRASE, ACCOUNT_0.path).keyPair)
+      expect(child.keyPair).toEqual({
+        privateKey: new Uint8Array(Buffer.from(ACCOUNT_0.keyPair.privateKey, 'hex')),
+        publicKey: new Uint8Array(Buffer.from(ACCOUNT_0.keyPair.publicKey, 'hex'))
+      })
     })
 
     test('should derive further from a derived child', async () => {

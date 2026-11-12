@@ -18,6 +18,9 @@ const ACCOUNT = {
   }
 }
 
+const MESSAGE = 'Dummy message to sign.'
+const MESSAGE_SIGNATURE = '0x67b1e4bb9a9b070cd60776ceab1ff4d7c4d4997bb5b4a71757da646f75d847e6600c22d8d83caa13d42c33099f75ba5ec30390467392aa78a3e5319da6c30e291b'
+
 const sendRawTransactionMock = jest.fn()
 const getAccountMock = jest.fn()
 const getAccountResourcesMock = jest.fn()
@@ -154,7 +157,10 @@ describe('WalletAccountTron', () => {
 
         expect(account.path).toBe(ACCOUNT.path)
         expect(await account.getAddress()).toBe(ACCOUNT.address)
-        expect(account.keyPair).toEqual(signer.keyPair)
+        expect(account.keyPair).toEqual({
+          privateKey: new Uint8Array(Buffer.from(ACCOUNT.keyPair.privateKey, 'hex')),
+          publicKey: new Uint8Array(Buffer.from(ACCOUNT.keyPair.publicKey, 'hex'))
+        })
       })
 
       test('should throw if a path is given along with the signer', () => {
@@ -262,7 +268,7 @@ describe('WalletAccountTron', () => {
       account.dispose()
 
       expect(signer.disposed).toBe(false)
-      expect(await signer.sign('Dummy message to sign.')).toBe(await new WalletAccountTron(SEED_PHRASE).sign('Dummy message to sign.'))
+      expect(await signer.sign(MESSAGE)).toBe(MESSAGE_SIGNATURE)
     })
 
     test('should not expose the private key of a supplied signer once disposed', () => {
@@ -305,12 +311,9 @@ describe('WalletAccountTron', () => {
   })
 
   describe('sign', () => {
-    const MESSAGE = 'Dummy message to sign.'
-    const EXPECTED_SIGNATURE = '0x67b1e4bb9a9b070cd60776ceab1ff4d7c4d4997bb5b4a71757da646f75d847e6600c22d8d83caa13d42c33099f75ba5ec30390467392aa78a3e5319da6c30e291b'
-
     test('should return the correct signature', async () => {
       const signature = await account.sign(MESSAGE)
-      expect(signature).toBe(EXPECTED_SIGNATURE)
+      expect(signature).toBe(MESSAGE_SIGNATURE)
     })
   })
 
