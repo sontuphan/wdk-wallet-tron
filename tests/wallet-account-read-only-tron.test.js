@@ -607,14 +607,16 @@ describe('WalletAccountReadOnlyTron', () => {
     const TRANSACTION_HASH = 'c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2'
 
     test('should throw ValueError when the transaction id is malformed', async () => {
-      await expect(account.getTransaction('not-a-valid-txid')).rejects.toThrow(ValueError)
+      await expect(account.getTransaction('not-a-valid-txid'))
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: "Invalid transaction id: 'not-a-valid-txid'." }))
       expect(getUnconfirmedTransactionInfoMock).not.toHaveBeenCalled()
     })
 
     test('should throw NoSuchElementError when the transaction is not known', async () => {
       getUnconfirmedTransactionInfoMock.mockResolvedValue({})
 
-      await expect(account.getTransaction(TRANSACTION_HASH)).rejects.toThrow(NoSuchElementError)
+      await expect(account.getTransaction(TRANSACTION_HASH))
+        .rejects.toThrow(expect.objectContaining({ constructor: NoSuchElementError, message: `No transaction found for '${TRANSACTION_HASH}'.` }))
       expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
       expect(getConfirmedCurrentBlockMock).not.toHaveBeenCalled()
     })
