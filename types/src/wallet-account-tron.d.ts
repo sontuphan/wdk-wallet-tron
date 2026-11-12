@@ -68,6 +68,12 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      */
     get keyPair(): KeyPair | null;
     /**
+     * Returns the account's address.
+     *
+     * @returns {Promise<string>} The account's address.
+     */
+    getAddress(): Promise<string>;
+    /**
      * Signs a message.
      *
      * @param {string} message - The message to sign.
