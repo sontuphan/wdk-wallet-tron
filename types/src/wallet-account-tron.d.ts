@@ -153,7 +153,8 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
     toReadOnlyAccount(): Promise<WalletAccountReadOnlyTron>;
     /**
      * Disposes the wallet account. The signer given at construction, and its private key, is wiped only if the
-     * account owns it (see {@link SignerOptions}); a caller-owned signer is left for the caller to dispose.
+     * account owns it (see {@link SignerOptions}); a caller-owned signer is left for the caller to dispose. Calling it
+     * again has no effect.
      */
     dispose(): void;
     /** @private */

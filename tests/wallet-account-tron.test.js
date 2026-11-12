@@ -283,6 +283,17 @@ describe('WalletAccountTron', () => {
       expect(account.keyPair.publicKey).toEqual(signer.keyPair.publicKey)
     })
 
+    test('should dispose an owned signer only once when disposed twice', () => {
+      const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
+      const disposeSpy = jest.spyOn(signer, 'dispose')
+      const account = new WalletAccountTron(signer, { shouldWipeSignerOnDisposal: true })
+      account.dispose()
+
+      account.dispose()
+
+      expect(disposeSpy).toHaveBeenCalledTimes(1)
+    })
+
     test('should wipe a supplied signer if the account is told to own it', () => {
       const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
       const account = new WalletAccountTron(signer, { shouldWipeSignerOnDisposal: true })

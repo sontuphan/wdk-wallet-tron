@@ -112,6 +112,16 @@ describe('WalletManagerTron', () => {
       expect(signer.disposed).toBe(true)
     })
 
+    test('should dispose the default signer built from a seed only once when disposed twice', () => {
+      const wallet = new WalletManagerTron(SEED_PHRASE)
+      const disposeSpy = jest.spyOn(wallet.getSigner(), 'dispose')
+      wallet.dispose()
+
+      wallet.dispose()
+
+      expect(disposeSpy).toHaveBeenCalledTimes(1)
+    })
+
     test('should not dispose signers supplied by the caller', async () => {
       const defaultSigner = new SeedSignerTron(SEED_PHRASE)
       const namedSigner = new PrivateKeySignerTron(PRIVATE_KEY)

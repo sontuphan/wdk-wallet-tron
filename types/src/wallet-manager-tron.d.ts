@@ -115,7 +115,8 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
     private _accountConfig;
     /**
      * Disposes all wallet accounts, and the default signer if the manager built it from a seed.
-     * A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed.
+     * A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed. Calling it again has
+     * no effect.
      */
     dispose(): void;
     /**
