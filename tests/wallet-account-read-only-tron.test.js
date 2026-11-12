@@ -335,6 +335,9 @@ describe('WalletAccountReadOnlyTron', () => {
       )
       expect(fee).toBe(EXPECTED_FEE)
       expect(activationFee).toBe(0n)
+
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ADDRESS)
+      expect(getChainParametersMock).toHaveBeenCalledWith()
     })
 
     test('should quote a pre-built transaction (bandwidth only, no energy, no activation)', async () => {
@@ -363,6 +366,8 @@ describe('WalletAccountReadOnlyTron', () => {
       expect(getChainParametersMock).not.toHaveBeenCalled()
       expect(fee).toBe(EXPECTED_FEE)
       expect(activationFee).toBe(0n)
+
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ADDRESS)
     })
 
     test('should throw if the account is not connected to tron web', async () => {
@@ -630,6 +635,8 @@ describe('WalletAccountReadOnlyTron', () => {
       })
       expect(info.success).toBeUndefined()
       expect(getConfirmedCurrentBlockMock).not.toHaveBeenCalled()
+
+      expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
     })
 
     test('should report confirmed while the block is not yet solidified', async () => {
@@ -655,6 +662,9 @@ describe('WalletAccountReadOnlyTron', () => {
         confirmations: 0
       })
       expect(info.receipt).toEqual(DUMMY_TRANSACTION_INFO)
+
+      expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
+      expect(getConfirmedCurrentBlockMock).toHaveBeenCalledWith()
     })
 
     test('should report final once the block is solidified', async () => {
@@ -672,6 +682,9 @@ describe('WalletAccountReadOnlyTron', () => {
 
       expect(info.finality).toBe('final')
       expect(info.confirmations).toBe(6)
+
+      expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
+      expect(getConfirmedCurrentBlockMock).toHaveBeenCalledWith()
     })
 
     test('should report success for a plain trx transfer without a receipt result', async () => {
@@ -687,6 +700,9 @@ describe('WalletAccountReadOnlyTron', () => {
       const info = await account.getTransaction(TRANSACTION_HASH)
 
       expect(info.success).toBe(true)
+
+      expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
+      expect(getConfirmedCurrentBlockMock).toHaveBeenCalledWith()
     })
 
     test('should report failure for a reverted contract call', async () => {
@@ -705,6 +721,9 @@ describe('WalletAccountReadOnlyTron', () => {
 
       expect(info.finality).toBe('final')
       expect(info.success).toBe(false)
+
+      expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
+      expect(getConfirmedCurrentBlockMock).toHaveBeenCalledWith()
     })
 
     test('should fall back to null confirmations when the solidified block is unavailable', async () => {
@@ -720,6 +739,9 @@ describe('WalletAccountReadOnlyTron', () => {
 
       expect(info.finality).toBe('confirmed')
       expect(info.confirmations).toBeNull()
+
+      expect(getUnconfirmedTransactionInfoMock).toHaveBeenCalledWith(TRANSACTION_HASH)
+      expect(getConfirmedCurrentBlockMock).toHaveBeenCalledWith()
     })
 
     test('should throw if the account is not connected to tron web', async () => {

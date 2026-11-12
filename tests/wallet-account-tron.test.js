@@ -430,6 +430,10 @@ describe('WalletAccountTron', () => {
 
       await expect(accountWithMaxFee.signTransaction(TRANSACTION))
         .rejects.toStrictEqual(new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.'))
+
+      expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
+      expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
     })
 
     test('should allow a fee exactly equal to transactionMaxFee', async () => {
@@ -466,6 +470,10 @@ describe('WalletAccountTron', () => {
         ...DUMMY_SEND_TRX_RESULT,
         signature: [EXPECTED_SIGNATURE]
       })
+
+      expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
+      expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
     })
 
     test('should allow a fee below transactionMaxFee', async () => {
@@ -502,6 +510,10 @@ describe('WalletAccountTron', () => {
         ...DUMMY_SEND_TRX_RESULT,
         signature: [EXPECTED_SIGNATURE]
       })
+
+      expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
+      expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
     })
 
     test('should sign a tronix transfer and return the signed tx', async () => {
@@ -517,6 +529,8 @@ describe('WalletAccountTron', () => {
         ...DUMMY_SEND_TRX_RESULT,
         signature: [EXPECTED_SIGNATURE]
       })
+
+      expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
     })
 
     test('should sign a consistent prebuilt transaction owned by the account', async () => {
@@ -609,6 +623,8 @@ describe('WalletAccountTron', () => {
 
       expect(fee).toBe(245_000n)
       expect(activationFee).toBe(0n)
+
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
     })
   })
 
@@ -714,6 +730,10 @@ describe('WalletAccountTron', () => {
         TronWeb.address.toHex(ACCOUNT.address)
       )
       expect(sendRawTransactionMock).toHaveBeenCalledWith({ ...TRANSACTION, signature: [SIGNATURE] })
+
+      expect(triggerConstantContractMock).toHaveBeenCalledWith(TronWeb.address.toHex(CONTRACT), '', { input: 'deadbeef', callValue: 0 }, [], TronWeb.address.toHex(ACCOUNT.address))
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
+      expect(getChainParametersMock).toHaveBeenCalledWith()
     })
 
     test('should successfully send a pre-built transaction', async () => {
@@ -747,6 +767,8 @@ describe('WalletAccountTron', () => {
       expect(activationFee).toBe(0n)
       expect(triggerConstantContractMock).not.toHaveBeenCalled()
       expect(sendRawTransactionMock).toHaveBeenCalledWith({ ...PREBUILT, signature: [SIGNATURE] })
+
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
     })
 
     test('should throw if the transaction owner does not match the account', async () => {
@@ -787,8 +809,6 @@ describe('WalletAccountTron', () => {
 
       sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
 
-      getAccountMock.mockResolvedValue({ address: RECIPIENT })
-
       getAccountResourcesMock.mockResolvedValue({
         freeNetLimit: 5000,
         freeNetUsed: 0,
@@ -804,6 +824,8 @@ describe('WalletAccountTron', () => {
 
       expect(sendRawTransactionMock).toHaveBeenCalledWith(SIGNED_TX)
       expect(sendTrxMock).not.toHaveBeenCalled()
+
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
     })
 
     test('should throw if transaction fee exceeds the transaction max fee configuration', async () => {
@@ -835,6 +857,10 @@ describe('WalletAccountTron', () => {
 
       await expect(accountWithMaxFee.sendTransaction(TRANSACTION))
         .rejects.toStrictEqual(new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.'))
+
+      expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
+      expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
     })
 
     test('should allow a fee exactly equal to transactionMaxFee', async () => {
@@ -870,6 +896,11 @@ describe('WalletAccountTron', () => {
 
       expect(hash).toBe(DUMMY_TX_ID)
       expect(fee).toBe(245_000n)
+
+      expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
+      expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
+      expect(sendRawTransactionMock).toHaveBeenCalledWith({ ...DUMMY_SEND_TRX_RESULT, signature: ['e2fbd0590d2a6150952afdcdb8c0b137a8828fe45dacc6f17f552b10234baa9231811488104983c4d4333ad51c90343801aa72e41b1d576719cc798c4c98546100'] })
     })
 
     test('should allow a fee below transactionMaxFee', async () => {
@@ -905,6 +936,11 @@ describe('WalletAccountTron', () => {
 
       expect(hash).toBe(DUMMY_TX_ID)
       expect(fee).toBe(245_000n)
+
+      expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address)
+      expect(getAccountMock).toHaveBeenCalledWith(TronWeb.address.toHex(TRANSACTION.to))
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
+      expect(sendRawTransactionMock).toHaveBeenCalledWith({ ...DUMMY_SEND_TRX_RESULT, signature: ['e2fbd0590d2a6150952afdcdb8c0b137a8828fe45dacc6f17f552b10234baa9231811488104983c4d4333ad51c90343801aa72e41b1d576719cc798c4c98546100'] })
     })
 
     test('should throw if the account is not connected to tron web', async () => {
@@ -1004,8 +1040,6 @@ describe('WalletAccountTron', () => {
         transaction: { raw_data_hex: '0a' + '00'.repeat(200) }
       })
 
-      getAccountMock.mockResolvedValue({ address: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD' })
-
       getAccountResourcesMock.mockResolvedValue({
         freeNetLimit: 0,
         freeNetUsed: 0,
@@ -1029,6 +1063,19 @@ describe('WalletAccountTron', () => {
         recipient: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
         amount: 100_000_000
       })).rejects.toStrictEqual(new MaximumFeeExceededError('Exceeded maximum fee cost for transfer operations.'))
+
+      expect(triggerConstantContractMock).toHaveBeenCalledWith(
+        'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
+        'transfer(address,uint256)',
+        {},
+        [
+          { type: 'address', value: TronWeb.address.toHex('TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD') },
+          { type: 'uint256', value: 100_000_000 }
+        ],
+        TronWeb.address.toHex(ACCOUNT.address)
+      )
+      expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
+      expect(getChainParametersMock).toHaveBeenCalledWith()
     })
 
     test('should throw if the account is not connected to tron web', async () => {
