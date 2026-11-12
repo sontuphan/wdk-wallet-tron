@@ -178,6 +178,12 @@ export default class WalletManagerTron extends WalletManager {
 
       const signer = await rootSigner.derive(path)
 
+      if (this._accounts[key]) {
+        signer.dispose()
+
+        return this._accounts[key]
+      }
+
       this._accounts[key] = new WalletAccountTron(signer, { ...this._accountConfig(), shouldWipeSignerOnDisposal: true })
     }
 

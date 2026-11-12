@@ -189,6 +189,22 @@ describe('WalletManagerTron', () => {
       expect(await wallet.getAccount(0)).toBe(await wallet.getAccount(0))
     })
 
+    test('should return the same account on concurrent calls', async () => {
+      const [first, second] = await Promise.all([wallet.getAccount(0), wallet.getAccount(0)])
+
+      expect(first).toBe(second)
+    })
+
+    test('should wipe the keys of concurrently requested accounts on dispose', async () => {
+      const wallet = new WalletManagerTron(SEED_PHRASE)
+      const [first, second] = await Promise.all([wallet.getAccount(0), wallet.getAccount(0)])
+
+      wallet.dispose()
+
+      expect(first.keyPair.privateKey).toBeNull()
+      expect(second.keyPair.privateKey).toBeNull()
+    })
+
     test('should return the account at the given index', async () => {
       const account = await wallet.getAccount(3)
 
