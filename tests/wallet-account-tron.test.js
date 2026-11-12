@@ -264,7 +264,7 @@ describe('WalletAccountTron', () => {
       account.dispose()
 
       expect(account.keyPair.privateKey).toBeNull()
-      expect(privateKey.every((byte) => byte === 0)).toBe(true)
+      expect(privateKey).toEqual(new Uint8Array(32))
     })
 
     test('should wipe the signer it built from a raw seed', () => {

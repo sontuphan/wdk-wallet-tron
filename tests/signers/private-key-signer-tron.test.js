@@ -113,7 +113,7 @@ describe('PrivateKeySignerTron', () => {
 
       expect(signer.disposed).toBe(true)
       expect(signer.keyPair).toEqual({ privateKey: null, publicKey: PUBLIC_KEY_BYTES })
-      expect(privateKey.every((byte) => byte === 0)).toBe(true)
+      expect(privateKey).toEqual(new Uint8Array(32))
     })
 
     test.each([

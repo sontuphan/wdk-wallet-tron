@@ -226,7 +226,7 @@ describe('SeedSignerTron', () => {
       expect(signer.disposed).toBe(true)
       expect(signer.keyPair.privateKey).toBeNull()
       expect(signer.keyPair.publicKey).toEqual(new Uint8Array(Buffer.from(ACCOUNT_0.keyPair.publicKey, 'hex')))
-      expect(privateKey.every((byte) => byte === 0)).toBe(true)
+      expect(privateKey).toEqual(new Uint8Array(32))
     })
 
     test('should not affect the children of the disposed signer', async () => {
