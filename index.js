@@ -13,7 +13,7 @@
 // limitations under the License.
 'use strict'
 
-/** @typedef {import('tronweb').TransactionInfo} TronTransactionReceipt */
+/** @typedef {import('./src/wallet-account-read-only-tron.js').TronTransactionReceipt} TronTransactionReceipt */
 /** @typedef {import('./src/wallet-account-read-only-tron.js').TronTransactionDetails} TronTransactionDetails */
 
 /** @typedef {import('@tetherto/wdk-wallet').FeeRates} FeeRates */
