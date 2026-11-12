@@ -143,11 +143,6 @@ export default class WalletManagerTron extends WalletManager {
    * @throws {NoSuchElementError} If no signer is registered with the given name.
    */
 
-  /**
-   * @param {number | string} [indexOrSignerName] - The account index, or a registered signer name (default: 0).
-   * @param {AccountOptions} [options] - Account options.
-   * @returns {Promise<WalletAccountTron>} The account.
-   */
   async getAccount (indexOrSignerName = 0, options = {}) {
     if (typeof indexOrSignerName === 'string') {
       const signerName = indexOrSignerName
