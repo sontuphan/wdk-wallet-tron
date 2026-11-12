@@ -49,8 +49,10 @@ export {
   DisposalError,
   InvalidSignerError,
   NoSuchElementError,
+  NotImplementedError,
   UnsupportedOperationError,
-  ValueError
+  ValueError,
+  WdkError
 } from '@tetherto/wdk-wallet'
 
 export { ISigner } from '@tetherto/wdk-wallet'

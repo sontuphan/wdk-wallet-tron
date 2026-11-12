@@ -37,6 +37,7 @@ export class ISignerTron extends ISigner {
    * @throws {UnsupportedOperationError} If the signer does not support account derivation.
    * @throws {ValueError} If the path is not valid.
    * @throws {DisposalError} If the signer has been disposed.
+   * @throws {NotImplementedError} If the implementation does not override this method.
    */
   async derive (path) {
     throw new NotImplementedError('derive(path)')
@@ -48,6 +49,7 @@ export class ISignerTron extends ISigner {
    * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
    * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
    * @throws {DisposalError} If the signer has been disposed.
+   * @throws {NotImplementedError} If the implementation does not override this method.
    */
   async signTransaction (transaction) {
     throw new NotImplementedError('signTransaction(transaction)')
