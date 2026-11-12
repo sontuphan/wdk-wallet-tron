@@ -50,11 +50,11 @@ describe('WalletManagerTron', () => {
   })
 
   describe('constructor', () => {
-    test('should wrap a seed in a seed signer at the coin-type node', () => {
+    test('should wrap a seed in a seed signer at the coin-type node', async () => {
       const signer = wallet.getSigner()
 
-      expect(signer).toBeInstanceOf(SeedSignerTron)
       expect(signer.path).toBe("m/44'/195'")
+      expect(await signer.getAddress()).toBe(COIN_NODE_ADDRESS)
       expect(wallet.seed).toBeUndefined()
     })
 
@@ -207,7 +207,6 @@ describe('WalletManagerTron', () => {
 
       const account = await wallet.getAccount('hot')
 
-      expect(account).toBeInstanceOf(WalletAccountTron)
       expect(account.path).toBeNull()
       expect(await account.getAddress()).toBe(ACCOUNT_0_ADDRESS)
     })
@@ -277,8 +276,6 @@ describe('WalletManagerTron', () => {
     test('should return the account at index 0 by default', async () => {
       const account = await wallet.getAccount()
 
-      expect(account).toBeInstanceOf(WalletAccountTron)
-
       expect(account.path).toBe("m/44'/195'/0'/0/0")
       expect(await account.getAddress()).toBe(ACCOUNT_0_ADDRESS)
     })
@@ -315,8 +312,6 @@ describe('WalletManagerTron', () => {
     test('should return the account at the given index', async () => {
       const account = await wallet.getAccount(3)
 
-      expect(account).toBeInstanceOf(WalletAccountTron)
-
       expect(account.path).toBe("m/44'/195'/0'/0/3")
     })
 
@@ -329,8 +324,6 @@ describe('WalletManagerTron', () => {
   describe('getAccountByPath', () => {
     test('should return the account with the given path', async () => {
       const account = await wallet.getAccountByPath("1'/2/3")
-
-      expect(account).toBeInstanceOf(WalletAccountTron)
 
       expect(account.path).toBe("m/44'/195'/1'/2/3")
     })

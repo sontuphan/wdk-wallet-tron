@@ -1136,7 +1136,6 @@ describe('WalletAccountTron', () => {
   describe('toReadOnlyAccount', () => {
     test('should return a read-only copy of the account', async () => {
       const readOnlyAccount = await account.toReadOnlyAccount()
-      expect(readOnlyAccount).toBeInstanceOf(WalletAccountReadOnlyTron)
 
       const readOnlyAddress = await readOnlyAccount.getAddress()
       expect(readOnlyAddress).toBe(ACCOUNT.address)

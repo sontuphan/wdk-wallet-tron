@@ -633,12 +633,13 @@ describe('WalletAccountReadOnlyTron', () => {
     })
 
     test('should report confirmed while the block is not yet solidified', async () => {
-      getUnconfirmedTransactionInfoMock.mockResolvedValue({
+      const DUMMY_TRANSACTION_INFO = {
         id: TRANSACTION_HASH,
         blockNumber: 12345,
         fee: 1000,
         receipt: { result: 'SUCCESS' }
-      })
+      }
+      getUnconfirmedTransactionInfoMock.mockResolvedValue(DUMMY_TRANSACTION_INFO)
       getConfirmedCurrentBlockMock.mockResolvedValue({
         block_header: { raw_data: { number: 12340 } }
       })
@@ -653,7 +654,7 @@ describe('WalletAccountReadOnlyTron', () => {
         fee: 1000n,
         confirmations: 0
       })
-      expect(info.receipt).not.toBeNull()
+      expect(info.receipt).toEqual(DUMMY_TRANSACTION_INFO)
     })
 
     test('should report final once the block is solidified', async () => {

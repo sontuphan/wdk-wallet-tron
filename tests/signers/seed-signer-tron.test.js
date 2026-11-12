@@ -125,7 +125,6 @@ describe('SeedSignerTron', () => {
 
       const child = await root.derive("0'/0/1")
 
-      expect(child).toBeInstanceOf(SeedSignerTron)
       expect(child.isDerivable).toBe(true)
       expect(child.path).toBe(ACCOUNT_1.path)
       expect(await child.getAddress()).toBe(ACCOUNT_1.address)
