@@ -111,6 +111,12 @@ describe('SeedSignerTron', () => {
         publicKey: new Uint8Array(Buffer.from(ACCOUNT_0.keyPair.publicKey, 'hex'))
       })
     })
+
+    test('should not be disposed after construction', () => {
+      const signer = new SeedSignerTron(SEED_PHRASE)
+
+      expect(signer.disposed).toBe(false)
+    })
   })
 
   describe('derive', () => {
@@ -123,6 +129,14 @@ describe('SeedSignerTron', () => {
       expect(child.isDerivable).toBe(true)
       expect(child.path).toBe(ACCOUNT_1.path)
       expect(await child.getAddress()).toBe(ACCOUNT_1.address)
+    })
+
+    test('should return a child that is not disposed', async () => {
+      const root = new SeedSignerTron(SEED_PHRASE)
+
+      const child = await root.derive("0'/0/0")
+
+      expect(child.disposed).toBe(false)
     })
 
     test('should derive the same key as the constructor', async () => {
@@ -203,13 +217,6 @@ describe('SeedSignerTron', () => {
   })
 
   describe('dispose', () => {
-    test('should not be disposed after construction or derivation', async () => {
-      const root = new SeedSignerTron(SEED_PHRASE)
-
-      expect(root.disposed).toBe(false)
-      expect((await root.derive("0'/0/0")).disposed).toBe(false)
-    })
-
     test('should erase the private key', () => {
       const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT_0.path)
       const { privateKey } = signer.keyPair
