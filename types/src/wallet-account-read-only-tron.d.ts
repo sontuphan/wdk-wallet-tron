@@ -246,6 +246,9 @@ export type ContractFunctionParameter = import("tronweb").Types.ContractFunction
 export type TransactionResult = import("@tetherto/wdk-wallet").TransactionResult;
 export type TransferOptions = import("@tetherto/wdk-wallet").TransferOptions;
 export type TransferResult = import("@tetherto/wdk-wallet").TransferResult;
+/**
+ * A native tronix (TRX) transfer.
+ */
 export type TronTrxTransfer = {
     /**
      * - The transaction's recipient.
@@ -277,6 +280,12 @@ export type TronSmartContractCall = {
      */
     options?: TriggerSmartContractOptions;
 };
+/**
+ * A transaction the wallet can send. One of:
+ * - a native tronix transfer ({@link TronTrxTransfer});
+ * - a smart contract call ({@link TronSmartContractCall});
+ * - a pre-built tron web transaction.
+ */
 export type TronTransaction = TronTrxTransfer | TronSmartContractCall | Transaction;
 export type TronWalletConfig = {
     /**
