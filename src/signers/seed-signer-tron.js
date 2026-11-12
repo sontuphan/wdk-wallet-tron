@@ -34,6 +34,10 @@ import { getTronAddress, parseDerivationPath, signMessage, signTransaction } fro
  */
 export const BIP_44_TRON_DERIVATION_PATH_PREFIX = "m/44'/195'"
 
+const MIN_SEED_LENGTH_IN_BYTES = 16
+
+const MAX_SEED_LENGTH_IN_BYTES = 64
+
 /**
  * Securely erases an HD node's private key and chain code from memory.
  *
@@ -104,8 +108,8 @@ export default class SeedSignerTron {
       if (!bip39.validateMnemonic(seed)) {
         throw new ValueError('The seed phrase is invalid.')
       }
-    } else if (seed.length < 16 || seed.length > 64) {
-      throw new ValueError('The seed must be between 16 and 64 bytes.')
+    } else if (seed.length < MIN_SEED_LENGTH_IN_BYTES || seed.length > MAX_SEED_LENGTH_IN_BYTES) {
+      throw new ValueError(`The seed must be between ${MIN_SEED_LENGTH_IN_BYTES} and ${MAX_SEED_LENGTH_IN_BYTES} bytes.`)
     }
 
     const seedBytes = ownsSeed ? bip39.mnemonicToSeedSync(seed) : seed

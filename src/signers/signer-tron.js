@@ -98,6 +98,8 @@ export function parseDerivationPath (path, { requireAbsolute = false } = {}) {
   })
 }
 
+const ADDRESS_HASH_OFFSET_IN_BYTES = 12
+
 /**
  * Returns the tron address of a secp256k1 public key.
  *
@@ -110,7 +112,7 @@ export function getTronAddress (publicKey) {
     .slice(1)
 
   const publicKeyHash = keccak_256(uncompressedPublicKey)
-  const addressBytes = publicKeyHash.slice(12)
+  const addressBytes = publicKeyHash.slice(ADDRESS_HASH_OFFSET_IN_BYTES)
   const addressHex = '41' + Buffer.from(addressBytes).toString('hex')
 
   return TronWeb.address.fromHex(addressHex)

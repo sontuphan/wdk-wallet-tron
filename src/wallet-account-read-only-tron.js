@@ -100,6 +100,7 @@ const BANDWIDTH_PRICE = 1_000n
 const ACCOUNT_ACTIVATION_FEE_SUN = 1_000_000n
 const ACCOUNT_ACTIVATION_BANDWIDTH_COST = 100_000n
 const DEFAULT_FEE_LIMIT_SUN = 15_000_000
+const DEFAULT_WAIT_TIMEOUT_MS = 90_000
 /**
  * The length of an ECDSA signature in bytes.
  */
@@ -598,7 +599,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * @type {number}
    */
   get defaultWaitTimeout () {
-    return 90000
+    return DEFAULT_WAIT_TIMEOUT_MS
   }
 
   /**
