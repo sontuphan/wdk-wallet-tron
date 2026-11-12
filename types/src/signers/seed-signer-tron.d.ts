@@ -93,6 +93,7 @@ export default class SeedSignerTron implements ISignerTron {
      *
      * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
      * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
+     * @throws {ValueError} If the transaction id is not a 32-byte hex string.
      * @throws {DisposalError} If the signer has been disposed.
      */
     signTransaction(transaction: Transaction | SignedTransaction): Promise<SignedTransaction>;

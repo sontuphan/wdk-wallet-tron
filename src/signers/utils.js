@@ -99,14 +99,21 @@ export function signMessage (privateKey, message) {
   return '0x' + hex
 }
 
+const TRANSACTION_ID_PATTERN = /^[0-9a-fA-F]{64}$/
+
 /**
  * Signs a transaction's id with a raw secp256k1 private key, keeping the signatures it already carries.
  *
  * @param {Uint8Array} privateKey - The raw private key (32 bytes).
  * @param {Transaction | SignedTransaction} transaction - The transaction.
  * @returns {SignedTransaction} The transaction with the key's signature appended.
+ * @throws {ValueError} If the transaction id is not a 32-byte hex string.
  */
 export function signTransaction (privateKey, transaction) {
+  if (!TRANSACTION_ID_PATTERN.test(transaction.txID)) {
+    throw new ValueError('The transaction id must be a 32-byte hex string.')
+  }
+
   const transactionBytes = Buffer.from(transaction.txID, 'hex')
 
   const signature = secp256k1.sign(transactionBytes, privateKey, { lowS: true })

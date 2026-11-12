@@ -33,6 +33,7 @@ export function signMessage(privateKey: Uint8Array, message: string): string;
  * @param {Uint8Array} privateKey - The raw private key (32 bytes).
  * @param {Transaction | SignedTransaction} transaction - The transaction.
  * @returns {SignedTransaction} The transaction with the key's signature appended.
+ * @throws {ValueError} If the transaction id is not a 32-byte hex string.
  */
 export function signTransaction(privateKey: Uint8Array, transaction: Transaction | SignedTransaction): SignedTransaction;
 export type Transaction = import("tronweb").Types.Transaction;

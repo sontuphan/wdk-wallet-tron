@@ -70,6 +70,20 @@ describe('PrivateKeySignerTron', () => {
   })
 
   describe('signTransaction', () => {
+    test('should throw if the transaction id is shorter than 32 bytes', async () => {
+      const signer = new PrivateKeySignerTron(ACCOUNT.keyPair.privateKey)
+
+      await expect(signer.signTransaction({ ...TRANSACTION, txID: 'abc' }))
+        .rejects.toStrictEqual(new ValueError('The transaction id must be a 32-byte hex string.'))
+    })
+
+    test('should throw if the transaction id is not hex', async () => {
+      const signer = new PrivateKeySignerTron(ACCOUNT.keyPair.privateKey)
+
+      await expect(signer.signTransaction({ ...TRANSACTION, txID: 'z'.repeat(64) }))
+        .rejects.toStrictEqual(new ValueError('The transaction id must be a 32-byte hex string.'))
+    })
+
     test('should sign the transaction id', async () => {
       const signer = new PrivateKeySignerTron(ACCOUNT.keyPair.privateKey)
 
