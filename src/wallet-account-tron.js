@@ -70,19 +70,21 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * Creates a new tron wallet account from a seed.
    *
    * @overload
-   * @param {string | Uint8Array} seed - A [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
+   * @param {string | Uint8Array} seed - A BIP-39 mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
    * @param {string} path - The BIP-44 derivation path, relative to "m/44'/195'" (e.g. "0'/0/0").
    * @param {TronWalletConfig} [config] - The configuration object.
    * @throws {ValueError} If the seed phrase or the path is not valid.
+   * @see https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
    */
 
   /**
    * Creates the first tron wallet account (m/44'/195'/0'/0/0) from a seed.
    *
    * @overload
-   * @param {string | Uint8Array} seed - A [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
+   * @param {string | Uint8Array} seed - A BIP-39 mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
    * @param {TronWalletConfig} [config] - The configuration object.
    * @throws {ValueError} If the seed phrase is not valid.
+   * @see https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
    */
   constructor (seedOrSigner, pathOrConfig, config = {}) {
     const isSeed = typeof seedOrSigner === 'string' || seedOrSigner instanceof Uint8Array
@@ -157,10 +159,11 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
   }
 
   /**
-   * The derivation path of this account (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)),
+   * The derivation path of this account (see BIP-44),
    * or null for an account backed by a non-HD signer.
    *
    * @type {string | null}
+   * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
    */
   get path () {
     return this._signer.path

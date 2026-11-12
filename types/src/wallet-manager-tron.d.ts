@@ -62,7 +62,7 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      */
     protected _tronWeb: ReturnType<typeof WalletAccountTron.initializeProvider>;
     /**
-     * Returns the wallet account at a specific index (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
+     * Returns the wallet account at a specific index (see BIP-44).
      *
      * **Warning:** derivation is relative to the signer's own path. If the signer sits at a leaf
      * (e.g. m/44'/195'/0'/0/0), getAccount(1) derives m/44'/195'/0'/0/0/0'/0/1, probably not what
@@ -80,6 +80,7 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
      * @throws {InvalidSignerError} If the signer doesn't support account derivation.
      * @throws {DisposalError} If the signer has been disposed.
+     * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
      */
     getAccount(index?: number, options?: AccountOptions): Promise<WalletAccountTron>;
     /**
