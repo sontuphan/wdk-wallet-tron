@@ -144,11 +144,13 @@ export default class WalletManagerTron extends WalletManager {
     if (typeof indexOrSignerName === 'string') {
       const signerName = indexOrSignerName
 
-      if (!this._accounts[signerName]) {
-        this._accounts[signerName] = new WalletAccountTron(this.getSigner(signerName), this._accountConfig())
+      const key = `signer:${signerName}`
+
+      if (!this._accounts[key]) {
+        this._accounts[key] = new WalletAccountTron(this.getSigner(signerName), this._accountConfig())
       }
 
-      return this._accounts[signerName]
+      return this._accounts[key]
     }
 
     return await this.getAccountByPath(`0'/0/${indexOrSignerName}`, options)
@@ -167,7 +169,7 @@ export default class WalletManagerTron extends WalletManager {
    */
   async getAccountByPath (path, options = {}) {
     const { signerName } = options
-    const key = signerName === undefined ? path : `${signerName}:${path}`
+    const key = signerName === undefined ? `path:${path}` : `path:${signerName}:${path}`
 
     if (!this._accounts[key]) {
       const rootSigner = this.getSigner(signerName)
