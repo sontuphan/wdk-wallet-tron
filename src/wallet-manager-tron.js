@@ -14,7 +14,7 @@
 
 'use strict'
 
-import WalletManager, { InvalidSignerError } from '@tetherto/wdk-wallet'
+import WalletManager, { InvalidSignerError, ProviderRequiredError } from '@tetherto/wdk-wallet'
 
 import WalletAccountTron from './wallet-account-tron.js'
 import SeedSignerTron from './signers/seed-signer-tron.js'
@@ -219,10 +219,11 @@ export default class WalletManagerTron extends WalletManager {
    * Returns the current fee rates.
    *
    * @returns {Promise<FeeRates>} The fee rates (in suns).
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async getFeeRates () {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to get fee rates.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to get fee rates.')
     }
 
     const chainParameters = await this._tronWeb.trx.getChainParameters()

@@ -10,6 +10,7 @@ describe('index', () => {
     'InvalidSignerError',
     'NoSuchElementError',
     'NotImplementedError',
+    'ProviderRequiredError',
     'UnsupportedOperationError',
     'ValueError',
     'WdkError'

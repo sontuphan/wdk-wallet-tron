@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, jest, test } from '@jest/globals'
 
 import { TronWeb, Trx } from 'tronweb'
-import { NoSuchElementError, ValueError } from '@tetherto/wdk-wallet'
+import { NoSuchElementError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
 
 const ADDRESS = 'TXngH8bVadn9ZWtKBgjKQcqN1GsZ7A1jcb'
 
@@ -108,7 +108,7 @@ describe('WalletAccountReadOnlyTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnectedAccount = new WalletAccountReadOnlyTron(ADDRESS)
       await expect(disconnectedAccount.getBalance())
-        .rejects.toThrow('The wallet must be connected to tron web to retrieve balances.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to retrieve balances.'))
     })
   })
 
@@ -138,7 +138,7 @@ describe('WalletAccountReadOnlyTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnectedAccount = new WalletAccountReadOnlyTron(ADDRESS)
       await expect(disconnectedAccount.getTokenBalance(TOKEN_ADDRESS))
-        .rejects.toThrow('The wallet must be connected to tron web to retrieve token balances.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to retrieve token balances.'))
     })
   })
 
@@ -172,7 +172,7 @@ describe('WalletAccountReadOnlyTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnectedAccount = new WalletAccountReadOnlyTron(ADDRESS)
       await expect(disconnectedAccount.getAllowance(TOKEN_ADDRESS, SPENDER))
-        .rejects.toThrow('The wallet must be connected to tron web to retrieve allowances.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to retrieve allowances.'))
     })
   })
 
@@ -368,7 +368,7 @@ describe('WalletAccountReadOnlyTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnectedAccount = new WalletAccountReadOnlyTron(ADDRESS)
       await expect(disconnectedAccount.quoteSendTransaction({ to: ADDRESS, value: 1000 }))
-        .rejects.toThrow('The wallet must be connected to tron web to quote transactions.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to quote transactions.'))
     })
   })
 
@@ -559,7 +559,7 @@ describe('WalletAccountReadOnlyTron', () => {
         recipient: ADDRESS,
         amount: 100
       }))
-        .rejects.toThrow('The wallet must be connected to tron web to quote transfer operations.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to quote transfer operations.'))
     })
   })
 
@@ -594,7 +594,7 @@ describe('WalletAccountReadOnlyTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnectedAccount = new WalletAccountReadOnlyTron(ADDRESS)
       await expect(disconnectedAccount.getTransactionReceipt(TRANSACTION_HASH))
-        .rejects.toThrow('The wallet must be connected to tron web to fetch transaction receipts.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to fetch transaction receipts.'))
     })
   })
 
@@ -724,7 +724,7 @@ describe('WalletAccountReadOnlyTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnectedAccount = new WalletAccountReadOnlyTron(ADDRESS)
       await expect(disconnectedAccount.getTransaction(TRANSACTION_HASH))
-        .rejects.toThrow('The wallet must be connected to tron web to fetch transactions.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to fetch transactions.'))
     })
   })
 })

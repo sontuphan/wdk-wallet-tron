@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
 
+import { ProviderRequiredError } from '@tetherto/wdk-wallet'
+
 import * as bip39 from 'bip39'
 
 import { TronWeb, Trx } from 'tronweb'
@@ -274,7 +276,7 @@ describe('WalletManagerTron', () => {
     test('should throw if the wallet is not connected to tron web', async () => {
       const disconnectedWallet = new WalletManagerTron(SEED_PHRASE)
       await expect(disconnectedWallet.getFeeRates())
-        .rejects.toThrow('The wallet must be connected to tron web to get fee rates.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to get fee rates.'))
     })
   })
 })

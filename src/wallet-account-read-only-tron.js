@@ -14,7 +14,7 @@
 
 'use strict'
 
-import { WalletAccountReadOnly, NoSuchElementError, ValueError } from '@tetherto/wdk-wallet'
+import { WalletAccountReadOnly, NoSuchElementError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
 
 import FailoverProvider from '@tetherto/wdk-failover-provider'
 
@@ -185,10 +185,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * Returns the account's tronix balance.
    *
    * @returns {Promise<bigint>} The tronix balance (in suns).
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async getBalance () {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to retrieve balances.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to retrieve balances.')
     }
 
     const address = await this.getAddress()
@@ -203,10 +204,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    *
    * @param {string} tokenAddress - The smart contract address of the token.
    * @returns {Promise<bigint>} The token balance (in base unit).
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async getTokenBalance (tokenAddress) {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to retrieve token balances.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to retrieve token balances.')
     }
 
     const address = await this.getAddress()
@@ -228,10 +230,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * @param {string} tokenAddress - The smart contract address of the token.
    * @param {string} spender - The spender's address.
    * @returns {Promise<bigint>} The allowance (in base unit).
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async getAllowance (tokenAddress, spender) {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to retrieve allowances.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to retrieve allowances.')
     }
 
     const address = await this.getAddress()
@@ -250,10 +253,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    *
    * @param {TronTransaction} tx - The transaction.
    * @returns {Promise<Omit<TransactionResult, 'hash'> & TronActivationFee>} The transaction's quotes.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async quoteSendTransaction (tx) {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to quote transactions.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to quote transactions.')
     }
 
     const transaction = await this._buildTransaction(tx)
@@ -397,10 +401,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    *
    * @param {TransferOptions} options - The transfer's options.
    * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async quoteTransfer ({ token, recipient, amount }) {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to quote transfer operations.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to quote transfer operations.')
     }
 
     const address = await this.getAddress()
@@ -464,10 +469,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * @deprecated Use {@link getTransaction} instead, which returns a normalized, finality-based receipt. The raw tron receipt remains available on its `receipt` property.
    * @param {string} hash - The transaction's hash.
    * @returns {Promise<TronTransactionReceipt | null>} The receipt, or null if the transaction has not been included in a block yet.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async getTransactionReceipt (hash) {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to fetch transaction receipts.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to fetch transaction receipts.')
     }
 
     const receipt = await this._tronWeb.trx.getTransactionInfo(hash)
@@ -489,10 +495,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The normalized receipt.
    * @throws {ValueError} If the hash is not a valid transaction id.
    * @throws {NoSuchElementError} If no transaction has been found for the given hash.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async getTransaction (hash) {
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to fetch transactions.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to fetch transactions.')
     }
 
     if (typeof hash !== 'string' || !/^(0x)?[0-9a-fA-F]{64}$/.test(hash.trim())) {

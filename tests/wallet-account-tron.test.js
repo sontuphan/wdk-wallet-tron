@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
+
+import { ProviderRequiredError } from '@tetherto/wdk-wallet'
 import * as bip39 from 'bip39'
 
 import { TronWeb, Trx } from 'tronweb'
@@ -364,6 +366,13 @@ describe('WalletAccountTron', () => {
   }
 
   describe('signTransaction', () => {
+    test('should throw if the account is not connected to tron web', async () => {
+      const disconnected = new WalletAccountTron(SEED_PHRASE, "0'/0/0")
+
+      await expect(disconnected.signTransaction({ to: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD', value: 1_000_000 }))
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to sign transactions.'))
+    })
+
     test('should throw if transaction fee exceeds the transaction max fee configuration', async () => {
       const TRANSACTION = {
         to: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
@@ -876,7 +885,7 @@ describe('WalletAccountTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnected = new WalletAccountTron(SEED_PHRASE, "0'/0/0")
       await expect(disconnected.sendTransaction({ to: RECIPIENT, value: 1000 }))
-        .rejects.toThrow('The wallet must be connected to tron web to send transactions.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to send transactions.'))
     })
   })
 
@@ -1003,7 +1012,7 @@ describe('WalletAccountTron', () => {
         token: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
         recipient: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
         amount: 100
-      })).rejects.toThrow('The wallet must be connected to tron web to transfer tokens.')
+      })).rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to transfer tokens.'))
     })
   })
 
@@ -1095,7 +1104,7 @@ describe('WalletAccountTron', () => {
     test('should throw if the account is not connected to tron web', async () => {
       const disconnected = new WalletAccountTron(SEED_PHRASE, "0'/0/0")
       await expect(disconnected.approve(APPROVE))
-        .rejects.toThrow('The wallet must be connected to tron web to approve funds.')
+        .rejects.toStrictEqual(new ProviderRequiredError('The wallet must be connected to tron web to approve funds.'))
     })
   })
 

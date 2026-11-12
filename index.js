@@ -50,6 +50,7 @@ export {
   InvalidSignerError,
   NoSuchElementError,
   NotImplementedError,
+  ProviderRequiredError,
   UnsupportedOperationError,
   ValueError,
   WdkError

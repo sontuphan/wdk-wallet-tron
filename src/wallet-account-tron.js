@@ -14,7 +14,7 @@
 
 'use strict'
 
-import { DisposalError, ValueError } from '@tetherto/wdk-wallet'
+import { DisposalError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
 
 import WalletAccountReadOnlyTron from './wallet-account-read-only-tron.js'
 
@@ -218,6 +218,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @returns {Promise<TronSignedTransaction>} The signed transaction.
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async signTransaction (tx) {
     if (this._disposed) {
@@ -225,7 +226,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     }
 
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to sign transactions.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to sign transactions.')
     }
 
     const isPrebuilt = WalletAccountReadOnlyTron._isPrebuiltTransaction(tx)
@@ -261,6 +262,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async sendTransaction (tx) {
     if (this._disposed) {
@@ -268,7 +270,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     }
 
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to send transactions.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to send transactions.')
     }
 
     let signedTransaction = tx
@@ -327,6 +329,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @returns {Promise<TransferResult>} The transfer's result.
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {Error} If the transfer's cost exceeds the maximum transfer fee option.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async transfer ({ token, recipient, amount }) {
     if (this._disposed) {
@@ -334,7 +337,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     }
 
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to transfer tokens.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to transfer tokens.')
     }
 
     const { fee } = await this.quoteTransfer({ token, recipient, amount })
@@ -373,6 +376,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+   * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async approve (options) {
     if (this._disposed) {
@@ -380,7 +384,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     }
 
     if (!this._tronWeb) {
-      throw new Error('The wallet must be connected to tron web to approve funds.')
+      throw new ProviderRequiredError('The wallet must be connected to tron web to approve funds.')
     }
 
     const { token, spender, amount } = options
