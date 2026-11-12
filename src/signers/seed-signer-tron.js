@@ -141,8 +141,7 @@ export default class SeedSignerTron {
   }
 
   /**
-   * Whether the signer supports account derivation via {@link derive}. Always true: every seed
-   * signer holds an HD node and can derive below its own path.
+   * Whether the signer supports account derivation via {@link derive}.
    *
    * @type {true}
    */

@@ -96,8 +96,7 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * Whether the signer supports account derivation via {@link derive}. Always false: a private-key
-   * signer holds a single key.
+   * Whether the signer supports account derivation via {@link derive}.
    *
    * @type {false}
    */
@@ -107,7 +106,7 @@ export default class PrivateKeySignerTron {
 
   /**
    * The BIP 0032 derivation path, or null if the signer is not bound to a derivation position
-   * (e.g. private-key signers). Always null for a private-key signer.
+   * (e.g. private-key signers).
    *
    * @type {null}
    */
