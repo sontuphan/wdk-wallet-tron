@@ -37,7 +37,7 @@ const TRANSACTION = { txID: 'cbc59768e37a8d186165d94cb56579b8c76ec9b78239709c357
 const ACCOUNT_0_TRANSACTION_SIGNATURE = '90772e79b238b0ce83446675f091e48a5ee7d3e76afcd830d21e91247aa9f7800d91038aaada318c28c6f01a2563a4a29b970bc651c9bdff5e7f70daf9a4f7e101'
 const ACCOUNT_1_TRANSACTION_SIGNATURE = '7a17bbb17bb8d9d15fcf12c2ad5c8677260b9ef3384c57dacf80b9c3372223e3603599606895f60d46abf25764351e32413519a94e2df46daa86848a62c8dccb00'
 
-const DISPOSAL_ERROR = new DisposalError('The signer has been disposed.')
+const DISPOSAL_ERROR = expect.objectContaining({ constructor: DisposalError, message: 'The signer has been disposed.' })
 
 describe('SeedSignerTron', () => {
   describe('constructor', () => {
@@ -79,12 +79,12 @@ describe('SeedSignerTron', () => {
 
     test('should throw if the seed phrase is invalid', () => {
       expect(() => new SeedSignerTron(INVALID_SEED_PHRASE))
-        .toThrow(new ValueError('The seed phrase is invalid.'))
+        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The seed phrase is invalid.' }))
     })
 
     test.each([15, 65])('should throw if the seed is %i bytes long', (length) => {
       expect(() => new SeedSignerTron(new Uint8Array(length).fill(1)))
-        .toThrow(new ValueError('The seed must be between 16 and 64 bytes.'))
+        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The seed must be between 16 and 64 bytes.' }))
     })
 
     test('should throw if the path is not absolute', () => {

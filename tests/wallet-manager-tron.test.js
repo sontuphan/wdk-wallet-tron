@@ -34,7 +34,7 @@ const ACCOUNT_0_ADDRESS = 'TXngH8bVadn9ZWtKBgjKQcqN1GsZ7A1jcb'
 const ACCOUNT_1_ADDRESS = 'TLeUMvxvtUmbCyHAzf3FKV7C2FxquGDWUj'
 const SECOND_SEED_PHRASE = 'test walk nut penalty hip pave soap entry language right filter choice'
 const COIN_NODE_ADDRESS = 'TNKypw2WjeChcDkRJ5zkBxZqxUCrhUG1Ao'
-const UNSUPPORTED_DERIVATION_ERROR = new InvalidSignerError('The signer does not support account derivation.')
+const UNSUPPORTED_DERIVATION_ERROR = expect.objectContaining({ constructor: InvalidSignerError, message: 'The signer does not support account derivation.' })
 
 describe('WalletManagerTron', () => {
   let wallet

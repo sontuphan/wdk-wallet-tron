@@ -223,7 +223,7 @@ describe('WalletAccountTron', () => {
 
       account.dispose()
 
-      await expect(call(account)).rejects.toThrow(new DisposalError('The wallet account has been disposed.'))
+      await expect(call(account)).rejects.toThrow(expect.objectContaining({ constructor: DisposalError, message: 'The wallet account has been disposed.' }))
     })
 
     test('should throw a disposal error from approve before checking the provider', async () => {
@@ -232,7 +232,7 @@ describe('WalletAccountTron', () => {
       account.dispose()
 
       await expect(account.approve({ token: RECIPIENT, spender: RECIPIENT, amount: 1 }))
-        .rejects.toThrow(new DisposalError('The wallet account has been disposed.'))
+        .rejects.toThrow(expect.objectContaining({ constructor: DisposalError, message: 'The wallet account has been disposed.' }))
     })
 
     test('should still return the address once disposed', async () => {

@@ -21,9 +21,9 @@ const MESSAGE_SIGNATURE = '0x67b1e4bb9a9b070cd60776ceab1ff4d7c4d4997bb5b4a71757d
 const TRANSACTION = { txID: 'cbc59768e37a8d186165d94cb56579b8c76ec9b78239709c357e5d8ccaa59b38' }
 const TRANSACTION_SIGNATURE = '90772e79b238b0ce83446675f091e48a5ee7d3e76afcd830d21e91247aa9f7800d91038aaada318c28c6f01a2563a4a29b970bc651c9bdff5e7f70daf9a4f7e101'
 
-const INVALID_PRIVATE_KEY_ERROR = new ValueError('The private key must be a valid 32-byte secp256k1 key (hex or bytes).')
+const INVALID_PRIVATE_KEY_ERROR = expect.objectContaining({ constructor: ValueError, message: 'The private key must be a valid 32-byte secp256k1 key (hex or bytes).' })
 
-const DISPOSAL_ERROR = new DisposalError('The signer has been disposed.')
+const DISPOSAL_ERROR = expect.objectContaining({ constructor: DisposalError, message: 'The signer has been disposed.' })
 
 describe('PrivateKeySignerTron', () => {
   describe('constructor', () => {
