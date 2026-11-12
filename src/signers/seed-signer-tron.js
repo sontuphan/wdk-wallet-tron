@@ -112,7 +112,7 @@ export default class SeedSignerTron {
     let indexes, master
 
     try {
-      indexes = parseDerivationPath(path, true)
+      indexes = parseDerivationPath(path, { requireAbsolute: true })
 
       master = HDKey.fromMasterSeed(seedBytes)
     } finally {

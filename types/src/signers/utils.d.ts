@@ -3,12 +3,15 @@
 /**
  * Parses a BIP-32 derivation path into child indexes.
  *
- * @param {string} path - The derivation path; absolute ("m" or "m/...") if `absolute` is true, relative (e.g. "0'/0/0") otherwise.
- * @param {boolean} [absolute] - If true, the path must be absolute (default: false).
+ * @param {string} path - The derivation path; absolute ("m" or "m/...") if `options.requireAbsolute` is true, relative (e.g. "0'/0/0") otherwise.
+ * @param {Object} [options] - The parsing options.
+ * @param {boolean} [options.requireAbsolute] - If true, the path must be absolute (default: false).
  * @returns {number[]} The child indexes, with the hardened offset added to hardened ones.
  * @throws {ValueError} If the path is not valid.
  */
-export function parseDerivationPath(path: string, absolute?: boolean): number[];
+export function parseDerivationPath(path: string, { requireAbsolute }?: {
+    requireAbsolute?: boolean;
+}): number[];
 /**
  * Returns the tron address of a secp256k1 public key.
  *
