@@ -106,14 +106,11 @@ const DEFAULT_WAIT_TIMEOUT_MS = 90_000
  */
 const SIGNATURE_LENGTH_IN_BYTES = 65
 /**
- * A fixed overhead added by the TRON protocol to account for the transaction result
- * (MAX_RESULT_SIZE_IN_TX). Defined as 64 bytes.
+ * The fixed overhead, in bytes, that the TRON protocol adds for the transaction result (MAX_RESULT_SIZE_IN_TX).
  */
 const TRANSACTION_RESULT_OVERHEAD_IN_BYTES = 64
 /**
- * The approximate Protobuf overhead for the transaction envelope.
- * We use a generous value of 15 bytes to ensure we favor overestimation
- * (which is safer for fee limits) rather than underestimation.
+ * The approximate Protobuf overhead, in bytes, of the transaction envelope.
  */
 const PROTOBUF_OVERHEAD_IN_BYTES = 15
 
