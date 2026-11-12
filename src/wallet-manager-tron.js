@@ -19,7 +19,7 @@ import WalletManager, { InvalidSignerError, ProviderRequiredError } from '@tethe
 import WalletAccountTron from './wallet-account-tron.js'
 import SeedSignerTron from './signers/seed-signer-tron.js'
 
-/** @typedef {import("@tetherto/wdk-wallet").FeeRates} FeeRates */
+/** @typedef {import('@tetherto/wdk-wallet').FeeRates} FeeRates */
 /** @typedef {import('@tetherto/wdk-wallet').ValueError} ValueError */
 /** @typedef {import('@tetherto/wdk-wallet').NoSuchElementError} NoSuchElementError */
 /** @typedef {import('@tetherto/wdk-wallet').DisposalError} DisposalError */
