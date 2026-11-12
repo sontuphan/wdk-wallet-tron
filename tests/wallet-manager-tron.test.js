@@ -164,6 +164,23 @@ describe('WalletManagerTron', () => {
       expect(signer.disposed).toBe(true)
     })
 
+    test('should throw on getAccount for a previously returned index after dispose', async () => {
+      const wallet = new WalletManagerTron(SEED_PHRASE)
+      await wallet.getAccount(0)
+      wallet.dispose()
+
+      await expect(wallet.getAccount(0))
+        .rejects.toStrictEqual(new DisposalError('The wallet manager has been disposed.'))
+    })
+
+    test('should throw on getAccount for a new index after dispose', async () => {
+      const wallet = new WalletManagerTron(SEED_PHRASE)
+      wallet.dispose()
+
+      await expect(wallet.getAccount(1))
+        .rejects.toStrictEqual(new DisposalError('The wallet manager has been disposed.'))
+    })
+
     test('should not dispose signers supplied by the caller', async () => {
       const defaultSigner = new SeedSignerTron(SEED_PHRASE)
       const namedSigner = new PrivateKeySignerTron(PRIVATE_KEY)
