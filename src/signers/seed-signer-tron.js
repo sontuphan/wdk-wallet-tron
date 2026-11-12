@@ -60,6 +60,7 @@ function scrub (node) {
  * @param {HDKey} node - The starting HD node.
  * @param {number[]} indexes - The child indexes to derive.
  * @returns {HDKey} The HD node at the end of the path.
+ * @throws {Error} If a derived child key is invalid (probability below 2^-127 per derivation).
  */
 function deriveAndScrub (node, indexes) {
   for (const index of indexes) {
