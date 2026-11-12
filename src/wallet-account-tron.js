@@ -14,7 +14,7 @@
 
 'use strict'
 
-import { DisposalError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
+import { DisposalError, MaximumFeeExceededError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
 
 import WalletAccountReadOnlyTron from './wallet-account-read-only-tron.js'
 
@@ -217,7 +217,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {TronTransaction} tx - The transaction to sign.
    * @returns {Promise<TronSignedTransaction>} The signed transaction.
    * @throws {DisposalError} If the wallet account has been disposed.
-   * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+   * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async signTransaction (tx) {
@@ -238,7 +238,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     if (this._config.transactionMaxFee !== undefined) {
       const { fee } = await this._quoteTransaction(transaction)
       if (BigInt(fee) > BigInt(this._config.transactionMaxFee)) {
-        throw new Error('Exceeded maximum fee cost for transaction operation.')
+        throw new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.')
       }
     }
 
@@ -261,7 +261,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {TronTransaction | TronSignedTransaction} tx - The transaction, or a signed transaction.
    * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
    * @throws {DisposalError} If the wallet account has been disposed.
-   * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+   * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async sendTransaction (tx) {
@@ -288,7 +288,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     const { fee, activationFee } = await this.quoteSendTransaction(signedTransaction)
 
     if (this._config.transactionMaxFee !== undefined && BigInt(fee) > BigInt(this._config.transactionMaxFee)) {
-      throw new Error('Exceeded maximum fee cost for transaction operation.')
+      throw new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.')
     }
 
     const { txid } = await this._tronWeb.trx.sendRawTransaction(signedTransaction)
@@ -328,7 +328,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {TransferOptions} options - The transfer's options.
    * @returns {Promise<TransferResult>} The transfer's result.
    * @throws {DisposalError} If the wallet account has been disposed.
-   * @throws {Error} If the transfer's cost exceeds the maximum transfer fee option.
+   * @throws {MaximumFeeExceededError} If the transfer's cost exceeds the maximum transfer fee option.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async transfer ({ token, recipient, amount }) {
@@ -343,7 +343,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     const { fee } = await this.quoteTransfer({ token, recipient, amount })
 
     if (this._config.transferMaxFee !== undefined && fee > BigInt(this._config.transferMaxFee)) {
-      throw new Error('Exceeded maximum fee cost for transfer operations.')
+      throw new MaximumFeeExceededError('Exceeded maximum fee cost for transfer operations.')
     }
 
     const address = await this.getAddress()
@@ -375,7 +375,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {ApproveOptions} options - The approve options.
    * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
    * @throws {DisposalError} If the wallet account has been disposed.
-   * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+   * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async approve (options) {

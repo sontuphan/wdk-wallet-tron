@@ -50,6 +50,7 @@ export { default as WalletAccountTron } from './src/wallet-account-tron.js'
 export {
   DisposalError,
   InvalidSignerError,
+  MaximumFeeExceededError,
   NoSuchElementError,
   NotImplementedError,
   ProviderRequiredError,

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
 
-import { ProviderRequiredError } from '@tetherto/wdk-wallet'
+import { MaximumFeeExceededError, ProviderRequiredError } from '@tetherto/wdk-wallet'
 import * as bip39 from 'bip39'
 
 import { TronWeb, Trx } from 'tronweb'
@@ -429,7 +429,7 @@ describe('WalletAccountTron', () => {
       })
 
       await expect(accountWithMaxFee.signTransaction(TRANSACTION))
-        .rejects.toThrow('Exceeded maximum fee cost for transaction operation.')
+        .rejects.toStrictEqual(new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.'))
     })
 
     test('should allow a fee exactly equal to transactionMaxFee', async () => {
@@ -834,7 +834,7 @@ describe('WalletAccountTron', () => {
       })
 
       await expect(accountWithMaxFee.sendTransaction(TRANSACTION))
-        .rejects.toThrow('Exceeded maximum fee cost for transaction operation.')
+        .rejects.toStrictEqual(new MaximumFeeExceededError('Exceeded maximum fee cost for transaction operation.'))
     })
 
     test('should allow a fee exactly equal to transactionMaxFee', async () => {
@@ -1028,7 +1028,7 @@ describe('WalletAccountTron', () => {
         token: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
         recipient: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
         amount: 100_000_000
-      })).rejects.toThrow('Exceeded maximum fee cost for transfer operations.')
+      })).rejects.toStrictEqual(new MaximumFeeExceededError('Exceeded maximum fee cost for transfer operations.'))
     })
 
     test('should throw if the account is not connected to tron web', async () => {
