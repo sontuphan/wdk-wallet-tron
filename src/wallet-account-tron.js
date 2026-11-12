@@ -73,7 +73,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {string | Uint8Array} seed - A BIP-39 mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
    * @param {string} path - The BIP-44 derivation path, relative to "m/44'/195'" (e.g. "0'/0/0").
    * @param {TronWalletConfig} [config] - The configuration object.
-   * @throws {ValueError} If the seed phrase or the path is not valid.
+   * @throws {ValueError} If the seed or the path is not valid.
    * @see https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
    */
 
@@ -83,7 +83,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @overload
    * @param {string | Uint8Array} seed - A BIP-39 mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
    * @param {TronWalletConfig} [config] - The configuration object.
-   * @throws {ValueError} If the seed phrase is not valid.
+   * @throws {ValueError} If the seed is not a valid seed or BIP-39 seed phrase.
    * @see https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
    */
   constructor (seedOrSigner, pathOrConfig, config = {}) {

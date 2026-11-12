@@ -76,7 +76,7 @@ export default class WalletManagerTron extends WalletManager {
    * @overload
    * @param {string | Uint8Array} seed - A BIP-39 mnemonic seed phrase, or a raw BIP-32 master seed (16-64 bytes).
    * @param {TronWalletConfig} [config] - The configuration object.
-   * @throws {ValueError} If the seed phrase is not valid.
+   * @throws {ValueError} If the seed is not a valid seed or BIP-39 seed phrase.
    */
   constructor (seedOrSigner, config = {}) {
     const isSeed = typeof seedOrSigner === 'string' || seedOrSigner instanceof Uint8Array
