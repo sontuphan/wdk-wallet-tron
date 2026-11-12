@@ -263,6 +263,24 @@ describe('WalletAccountTron', () => {
       expect(await signer.sign('Dummy message to sign.')).toBe(await new WalletAccountTron(SEED_PHRASE).sign('Dummy message to sign.'))
     })
 
+    test('should not expose the private key of a supplied signer once disposed', () => {
+      const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
+      const account = new WalletAccountTron(signer)
+
+      account.dispose()
+
+      expect(account.keyPair.privateKey).toBeNull()
+    })
+
+    test('should still expose the public key of a supplied signer once disposed', () => {
+      const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
+      const account = new WalletAccountTron(signer)
+
+      account.dispose()
+
+      expect(account.keyPair.publicKey).toEqual(signer.keyPair.publicKey)
+    })
+
     test('should wipe a supplied signer if the account is told to own it', () => {
       const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
       const account = new WalletAccountTron(signer, { shouldWipeSignerOnDisposal: true })
