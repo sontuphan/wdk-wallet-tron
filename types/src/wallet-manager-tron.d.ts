@@ -92,9 +92,9 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      */
     getAccountByPath(path: string, options?: AccountOptions): Promise<WalletAccountTron>;
     /**
-     * Disposes all wallet accounts, and the default signer if the manager built it from a seed.
-     * A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed. Calling it again has
-     * no effect.
+     * Disposes all wallet accounts, clearing secret material from memory, and the default signer if the manager built it
+     * from a seed. A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed. Calling it
+     * again has no effect.
      */
     dispose(): void;
     /**

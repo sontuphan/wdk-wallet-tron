@@ -382,7 +382,8 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
   }
 
   /**
-   * Overrides the base default to allow for slower tron inclusion and solidification.
+   * The default time budget for {@link waitForTransaction}, in milliseconds, applied when the caller doesn't provide a
+   * `timeout`. On tron it is 90 seconds, which covers block inclusion and solidification.
    *
    * @type {number}
    */
