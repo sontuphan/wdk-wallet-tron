@@ -130,15 +130,22 @@ describe('WalletAccountTron', () => {
 
       expect(account.path).toBe(ACCOUNT.path)
       expect(await account.getAddress()).toBe(ACCOUNT.address)
-      expect(account._config).toEqual({ provider: 'https://tron.web.provider/' })
     })
 
-    test('should keep the config if the path is undefined', async () => {
+    test('should keep the config if only a seed and a config are given', () => {
+      const config = { provider: 'https://tron.web.provider/' }
+
+      const account = new WalletAccountTron(SEED_PHRASE, config)
+
+      expect(account.config).toBe(config)
+    })
+
+    test('should keep the config if the path is undefined', () => {
       const config = { provider: 'https://tron.web.provider/', transactionMaxFee: 1 }
+
       const account = new WalletAccountTron(SEED_PHRASE, undefined, config)
 
-      expect(account.path).toBe(ACCOUNT.path)
-      expect(account._config).toBe(config)
+      expect(account.config).toBe(config)
     })
 
     test('should default to the first account if only a seed is given', async () => {
