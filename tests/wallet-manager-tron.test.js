@@ -155,6 +155,15 @@ describe('WalletManagerTron', () => {
         .rejects.toStrictEqual(new DisposalError('The given signer has been disposed.'))
     })
 
+    test('should dispose the default signer built from a raw seed', () => {
+      const wallet = new WalletManagerTron(Uint8Array.from(bip39.mnemonicToSeedSync(SEED_PHRASE)))
+      const signer = wallet.getSigner()
+
+      wallet.dispose()
+
+      expect(signer.disposed).toBe(true)
+    })
+
     test('should not dispose signers supplied by the caller', async () => {
       const defaultSigner = new SeedSignerTron(SEED_PHRASE)
       const namedSigner = new PrivateKeySignerTron(PRIVATE_KEY)

@@ -261,6 +261,15 @@ describe('WalletAccountTron', () => {
       expect(privateKey.every((byte) => byte === 0)).toBe(true)
     })
 
+    test('should wipe the signer it built from a raw seed', () => {
+      const account = new WalletAccountTron(Uint8Array.from(SEED), "0'/0/0")
+      const { privateKey } = account.keyPair
+
+      account.dispose()
+
+      expect(privateKey).toEqual(new Uint8Array(32))
+    })
+
     test('should not wipe a signer supplied by the caller', async () => {
       const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
       const account = new WalletAccountTron(signer)
