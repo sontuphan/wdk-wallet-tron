@@ -122,9 +122,7 @@ describe('WalletAccountTron', () => {
 
     test('should throw if the path is invalid', () => {
       expect(() => { new WalletAccountTron(SEED_PHRASE, "a'/b/c") })
-        .toThrow(ValueError)
-      expect(() => { new WalletAccountTron(SEED_PHRASE, "a'/b/c") })
-        .toThrow('The derivation path "44\'/195\'/a\'/b/c" has an invalid child index: "a\'".')
+        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path "44\'/195\'/a\'/b/c" has an invalid child index: "a\'".' }))
     })
 
     test('should default to the first account if only a seed and a config are given', async () => {
@@ -167,9 +165,7 @@ describe('WalletAccountTron', () => {
         const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
 
         expect(() => new WalletAccountTron(signer, "0'/0/0", { provider: 'https://tron.web.provider/' }))
-          .toThrow(ValueError)
-        expect(() => new WalletAccountTron(signer, "0'/0/0", { provider: 'https://tron.web.provider/' }))
-          .toThrow('A derivation path cannot be given with a signer; derive the signer instead (e.g. signer.derive(path)).')
+          .toThrow(expect.objectContaining({ constructor: ValueError, message: 'A derivation path cannot be given with a signer; derive the signer instead (e.g. signer.derive(path)).' }))
       })
 
       test('should initialize without a config', async () => {

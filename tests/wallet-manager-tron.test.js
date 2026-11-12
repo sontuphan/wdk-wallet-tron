@@ -72,9 +72,7 @@ describe('WalletManagerTron', () => {
 
     test('should throw if the default signer is not derivable', () => {
       expect(() => new WalletManagerTron(new PrivateKeySignerTron(PRIVATE_KEY)))
-        .toThrow(InvalidSignerError)
-      expect(() => new WalletManagerTron(new PrivateKeySignerTron(PRIVATE_KEY)))
-        .toThrow('The default signer must be derivable. Non-derivable signers (e.g. private-key signers) can only be registered by name via addSigner.')
+        .toThrow(expect.objectContaining({ constructor: InvalidSignerError, message: 'The default signer must be derivable. Non-derivable signers (e.g. private-key signers) can only be registered by name via addSigner.' }))
     })
 
     test('should throw if the seed phrase is invalid', () => {
@@ -229,11 +227,15 @@ describe('WalletManagerTron', () => {
       expect(await wallet.getAccountByPath("0'/0/0", { signerName: 'second' })).toBe(account)
     })
 
-    test('should throw if the named signer does not support account derivation', async () => {
+    test('should throw on getAccount if the named signer does not support account derivation', async () => {
       wallet.addSigner('hot', new PrivateKeySignerTron(PRIVATE_KEY))
 
       await expect(wallet.getAccount(0, { signerName: 'hot' }))
         .rejects.toThrow(UNSUPPORTED_DERIVATION_ERROR)
+    })
+
+    test('should throw on getAccountByPath if the named signer does not support account derivation', async () => {
+      wallet.addSigner('hot', new PrivateKeySignerTron(PRIVATE_KEY))
 
       await expect(wallet.getAccountByPath("0'/0/0", { signerName: 'hot' }))
         .rejects.toThrow(UNSUPPORTED_DERIVATION_ERROR)
@@ -303,9 +305,7 @@ describe('WalletManagerTron', () => {
 
     test('should throw if the index is a negative number', async () => {
       await expect(wallet.getAccount(-1))
-        .rejects.toBeInstanceOf(ValueError)
-      await expect(wallet.getAccount(-1))
-        .rejects.toThrow('The derivation path "0\'/0/-1" has an invalid child index: "-1".')
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path "0\'/0/-1" has an invalid child index: "-1".' }))
     })
   })
 
@@ -320,9 +320,7 @@ describe('WalletManagerTron', () => {
 
     test('should throw if the path is invalid', async () => {
       await expect(wallet.getAccountByPath("a'/b/c"))
-        .rejects.toBeInstanceOf(ValueError)
-      await expect(wallet.getAccountByPath("a'/b/c"))
-        .rejects.toThrow('The derivation path "a\'/b/c" has an invalid child index: "a\'".')
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path "a\'/b/c" has an invalid child index: "a\'".' }))
     })
   })
 
