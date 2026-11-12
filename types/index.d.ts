@@ -23,4 +23,4 @@ export type TronWalletConfig = import("./src/wallet-account-read-only-tron.js").
 export type TronActivationFee = import("./src/wallet-account-read-only-tron.js").TronActivationFee;
 export type TronSignedTransaction = import("./src/wallet-account-tron.js").TronSignedTransaction;
 export type SignerOptions = import("./src/wallet-account-tron.js").SignerOptions;
-export { DisposalError, InvalidSignerError, NoSuchElementError, NotImplementedError, ProviderRequiredError, UnsupportedOperationError, ValueError, WdkError, ISigner } from "@tetherto/wdk-wallet";
+export { DisposalError, InvalidSignerError, NoSuchElementError, NotImplementedError, ProviderRequiredError, UnsupportedOperationError, ValueError, WdkError, ISigner, IWalletAccount, IWalletAccountReadOnly } from "@tetherto/wdk-wallet";
