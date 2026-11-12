@@ -4,7 +4,7 @@
 /** @typedef {import('tronweb').Types.Transaction} Transaction */
 /** @typedef {import('tronweb').Types.SignedTransaction} SignedTransaction */
 /**
- * Interface for Tron signers, extending the base `ISigner` from `@tetherto/wdk-wallet`.
+ * Interface for Tron signers.
  *
  * @interface
  */
