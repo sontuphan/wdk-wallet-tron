@@ -44,14 +44,15 @@ export default class SeedSignerTron implements ISignerTron {
     /** @private */
     private _disposed;
     /**
-     * Whether this signer can derive child signers. Always true: every seed signer holds an
-     * HD node and can derive below its own path.
+     * Whether the signer supports account derivation via {@link derive}. Always true: every seed
+     * signer holds an HD node and can derive below its own path.
      *
      * @type {true}
      */
     get isDerivable(): true;
     /**
-     * The signer's absolute derivation path.
+     * The BIP 0032 derivation path, or null if the signer is not bound to a derivation position
+     * (e.g. private-key signers). A seed signer is always bound, so this is its absolute path.
      *
      * @type {string}
      */
@@ -63,15 +64,16 @@ export default class SeedSignerTron implements ISignerTron {
      */
     get disposed(): boolean;
     /**
-     * The account's key pair. The private key is null once the signer has been disposed.
+     * The signer's key pair, or null if the signer does not allow retrieving key material (e.g. hardware
+     * signers). A seed signer always exposes its key pair; the private key is null once it is disposed.
      *
      * @type {KeyPair}
      */
     get keyPair(): KeyPair;
     /**
-     * Derives a child signer relative to this signer's own path (e.g. calling derive("0'/0/1") on
-     * a signer at "m/44'/195'" yields a child at "m/44'/195'/0'/0/1"). The child owns an independent
-     * copy of its key and can itself derive further.
+     * Derive a child signer using a relative path (e.g., "0'/0/0"). The path is relative to this signer's
+     * own path: calling derive("0'/0/1") on a signer at "m/44'/195'" yields a child at "m/44'/195'/0'/0/1".
+     * The child owns an independent copy of its key and can itself derive further.
      *
      * @param {string} relPath - The path to derive, relative to this signer's own path.
      * @returns {Promise<SeedSignerTron>} The derived child signer.
@@ -80,9 +82,9 @@ export default class SeedSignerTron implements ISignerTron {
      */
     derive(relPath: string): Promise<SeedSignerTron>;
     /**
-     * Returns the account's address.
+     * Returns the signer's address.
      *
-     * @returns {Promise<string>} The account's address.
+     * @returns {Promise<string>} The signer's address.
      */
     getAddress(): Promise<string>;
     /**

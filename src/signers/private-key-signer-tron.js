@@ -106,7 +106,8 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * Whether this signer can derive child signers.
+   * Whether the signer supports account derivation via {@link derive}. Always false: a private-key
+   * signer holds a single key.
    *
    * @type {false}
    */
@@ -115,7 +116,8 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * The derivation path. Always null for private-key signers.
+   * The BIP 0032 derivation path, or null if the signer is not bound to a derivation position
+   * (e.g. private-key signers). Always null for a private-key signer.
    *
    * @type {null}
    */
@@ -133,7 +135,8 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * The account's key pair. The private key is null once the signer has been disposed.
+   * The signer's key pair, or null if the signer does not allow retrieving key material (e.g. hardware
+   * signers). A private-key signer always exposes its key pair; the private key is null once it is disposed.
    *
    * @type {KeyPair}
    */
@@ -145,7 +148,8 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * Always rejects: a private-key signer holds a single key and cannot derive child signers.
+   * Derive a child signer using a relative path (e.g., "0'/0/0"). Always rejects: a private-key
+   * signer holds a single key and cannot derive child signers.
    *
    * @param {string} path - The relative derivation path (ignored).
    * @returns {Promise<never>} A promise that always rejects.
@@ -156,9 +160,9 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * Returns the account's address.
+   * Returns the signer's address.
    *
-   * @returns {Promise<string>} The account's address.
+   * @returns {Promise<string>} The signer's address.
    */
   async getAddress () {
     return this._address
