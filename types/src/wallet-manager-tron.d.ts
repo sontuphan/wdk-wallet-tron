@@ -76,6 +76,10 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @param {number} [index] - The index of the account to get (default: 0).
      * @param {AccountOptions} [options] - Account options.
      * @returns {Promise<WalletAccountTron>} The account.
+     * @throws {ValueError} If the index is not an integer between 0 and 2^31 - 1.
+     * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
+     * @throws {InvalidSignerError} If the signer doesn't support account derivation.
+     * @throws {DisposalError} If the signer has been disposed.
      */
     getAccount(index?: number, options?: AccountOptions): Promise<WalletAccountTron>;
     /**
@@ -88,6 +92,7 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @overload
      * @param {string} signerName - The signer name registered via {@link addSigner}.
      * @returns {Promise<WalletAccountTron>} The account.
+     * @throws {NoSuchElementError} If no signer is registered with the given name.
      */
     getAccount(signerName: string): Promise<WalletAccountTron>;
     /**
@@ -99,7 +104,10 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @param {string} path - The derivation path (e.g. "0'/0/0").
      * @param {AccountOptions} [options] - Account options.
      * @returns {Promise<WalletAccountTron>} The account.
+     * @throws {ValueError} If the path is not valid.
+     * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
      * @throws {InvalidSignerError} If the signer doesn't support account derivation.
+     * @throws {DisposalError} If the signer has been disposed.
      */
     getAccountByPath(path: string, options?: AccountOptions): Promise<WalletAccountTron>;
     /**
