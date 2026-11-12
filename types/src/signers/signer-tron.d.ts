@@ -43,7 +43,7 @@ export function signTransaction(privateKey: Uint8Array, transaction: Transaction
  *
  * @interface
  */
-export class ISignerTron extends ISigner {
+export interface ISignerTron extends ISigner {
     /**
      * Derive a child signer using a relative path (e.g., "0'/0/0").
      *
