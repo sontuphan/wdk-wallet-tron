@@ -681,7 +681,7 @@ describe('WalletAccountTron', () => {
         options: { feeLimit: 15_000_000 }
       }
       const DUMMY_TX_ID = 'contractcall123'
-      const TRANSACTION = {
+      const DUMMY_TRANSACTION = {
         txID: '12a406f767b30e00b317758aa25fcddc0ff8a329b7cad741dd204676d0e6c5ce',
         raw_data: {
           contract: [{
@@ -702,7 +702,7 @@ describe('WalletAccountTron', () => {
       // energy_used (10000) * energy price (420) = 4,200,000 SUN; bandwidth covered by the free limit
       const EXPECTED_FEE = 4_200_000n
 
-      triggerSmartContractMock.mockResolvedValue({ transaction: TRANSACTION })
+      triggerSmartContractMock.mockResolvedValue({ transaction: DUMMY_TRANSACTION })
 
       triggerConstantContractMock.mockResolvedValue({ energy_used: 10000 })
       sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
@@ -729,7 +729,7 @@ describe('WalletAccountTron', () => {
         CALL.parameters,
         TronWeb.address.toHex(ACCOUNT.address)
       )
-      expect(sendRawTransactionMock).toHaveBeenCalledWith({ ...TRANSACTION, signature: [SIGNATURE] })
+      expect(sendRawTransactionMock).toHaveBeenCalledWith({ ...DUMMY_TRANSACTION, signature: [SIGNATURE] })
 
       expect(triggerConstantContractMock).toHaveBeenCalledWith(TronWeb.address.toHex(CONTRACT), '', { input: 'deadbeef', callValue: 0 }, [], TronWeb.address.toHex(ACCOUNT.address))
       expect(getAccountResourcesMock).toHaveBeenCalledWith(ACCOUNT.address)
@@ -1099,7 +1099,7 @@ describe('WalletAccountTron', () => {
 
     const DUMMY_TX_ID = 'approvecall123'
 
-    const TRANSACTION = {
+    const DUMMY_TRANSACTION = {
       txID: '12a406f767b30e00b317758aa25fcddc0ff8a329b7cad741dd204676d0e6c5ce',
       raw_data: {
         contract: [{
@@ -1117,11 +1117,11 @@ describe('WalletAccountTron', () => {
       raw_data_hex: '0a' + '00'.repeat(200)
     }
 
-    // The signature of TRANSACTION.txID by the test account's private key.
+    // The signature of DUMMY_TRANSACTION.txID by the test account's private key.
     const SIGNATURE = 'b4273d17c4b46fb47d59b5aca2b4134cd83e02394a28bc4e86ffda7cbe1a21762b96e3af3d273d7e874153100fb2f1510f7e6579fa5ea9dde9107d4d15e1541100'
 
     beforeEach(() => {
-      triggerSmartContractMock.mockResolvedValue({ transaction: TRANSACTION })
+      triggerSmartContractMock.mockResolvedValue({ transaction: DUMMY_TRANSACTION })
       triggerConstantContractMock.mockResolvedValue({ energy_used: 10000 })
       sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
       getAccountResourcesMock.mockResolvedValue({
@@ -1154,7 +1154,7 @@ describe('WalletAccountTron', () => {
         TronWeb.address.toHex(ACCOUNT.address)
       )
       expect(sendRawTransactionMock).toHaveBeenCalledWith({
-        ...TRANSACTION,
+        ...DUMMY_TRANSACTION,
         signature: [SIGNATURE]
       })
     })
