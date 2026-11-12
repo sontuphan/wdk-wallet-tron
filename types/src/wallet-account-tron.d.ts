@@ -81,7 +81,8 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * it's strongly recommended to treat the key pair as a read-only view of the keys. While it's still technically possible to alter their
      * content, client code should never do so.
      *
-     * Null if the account's signer does not expose key material.
+     * Null if the account's signer does not expose key material. Once the account is disposed, the private key is null, even
+     * if the signer is owned by the caller and still holds it.
      *
      * @type {KeyPair | null}
      */
@@ -101,6 +102,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @returns {Promise<TronSignedTransaction>} The signed transaction.
      * @throws {DisposalError} If the wallet account has been disposed.
      * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     signTransaction(tx: TronTransaction): Promise<TronSignedTransaction>;
     /**
@@ -117,6 +119,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
      * @throws {DisposalError} If the wallet account has been disposed.
      * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     sendTransaction(tx: TronTransaction | TronSignedTransaction): Promise<TransactionResult & TronActivationFee>;
     /** @private */
@@ -131,6 +134,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @returns {Promise<TransferResult>} The transfer's result.
      * @throws {DisposalError} If the wallet account has been disposed.
      * @throws {Error} If the transfer's cost exceeds the maximum transfer fee option.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     transfer(options: TransferOptions): Promise<TransferResult>;
     /**
@@ -140,6 +144,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
      * @throws {DisposalError} If the wallet account has been disposed.
      * @throws {Error} If the transaction's cost exceeds the maximum transaction fee option.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     approve(options: ApproveOptions): Promise<TransactionResult & TronActivationFee>;
     /**

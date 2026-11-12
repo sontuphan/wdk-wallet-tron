@@ -49,6 +49,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * Returns the account's tronix balance.
      *
      * @returns {Promise<bigint>} The tronix balance (in suns).
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     getBalance(): Promise<bigint>;
     /**
@@ -56,6 +57,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      *
      * @param {string} tokenAddress - The smart contract address of the token.
      * @returns {Promise<bigint>} The token balance (in base unit).
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     getTokenBalance(tokenAddress: string): Promise<bigint>;
     /**
@@ -65,6 +67,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @param {string} tokenAddress - The smart contract address of the token.
      * @param {string} spender - The spender's address.
      * @returns {Promise<bigint>} The allowance (in base unit).
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     getAllowance(tokenAddress: string, spender: string): Promise<bigint>;
     /**
@@ -72,6 +75,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      *
      * @param {TronTransaction} tx - The transaction.
      * @returns {Promise<Omit<TransactionResult, 'hash'> & TronActivationFee>} The transaction's quotes.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     quoteSendTransaction(tx: TronTransaction): Promise<Omit<TransactionResult, "hash"> & TronActivationFee>;
     /**
@@ -132,6 +136,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      *
      * @param {TransferOptions} options - The transfer's options.
      * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     quoteTransfer(options: TransferOptions): Promise<Omit<TransferResult, "hash">>;
     /**
@@ -154,6 +159,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @deprecated Use {@link getTransaction} instead, which returns a normalized, finality-based receipt. The raw tron receipt remains available on its `receipt` property.
      * @param {string} hash - The transaction's hash.
      * @returns {Promise<TronTransactionReceipt | null>} The receipt, or null if the transaction has not been included in a block yet.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     getTransactionReceipt(hash: string): Promise<TronTransactionReceipt | null>;
     /**
@@ -166,6 +172,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @returns {Promise<TransactionReceipt & TronTransactionDetails>} The normalized receipt.
      * @throws {ValueError} If the hash is not a valid transaction id.
      * @throws {NoSuchElementError} If no transaction has been found for the given hash.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     getTransaction(hash: string): Promise<TransactionReceipt & TronTransactionDetails>;
     /**

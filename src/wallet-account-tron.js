@@ -135,6 +135,14 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
     /** @private */
     this._disposed = false
+
+    /**
+     * The read-only copy of the account, built on the first call to {@link toReadOnlyAccount}.
+     *
+     * @private
+     * @type {WalletAccountReadOnlyTron | undefined}
+     */
+    this._tronReadOnlyAccount = undefined
   }
 
   /**

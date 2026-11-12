@@ -119,6 +119,7 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * Returns the current fee rates.
      *
      * @returns {Promise<FeeRates>} The fee rates (in suns).
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
      */
     getFeeRates(): Promise<FeeRates>;
 }
