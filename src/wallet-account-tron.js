@@ -117,12 +117,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
      */
     this._config = config
 
-    /**
-     * The tron signer.
-     *
-     * @private
-     * @type {ISignerTron}
-     */
+    /** @private */
     this._signer = signer
 
     /**
@@ -136,12 +131,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     /** @private */
     this._disposed = false
 
-    /**
-     * The read-only copy of the account, built on the first call to {@link toReadOnlyAccount}.
-     *
-     * @private
-     * @type {WalletAccountReadOnlyTron | undefined}
-     */
+    /** @private */
     this._tronReadOnlyAccount = undefined
   }
 

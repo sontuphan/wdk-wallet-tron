@@ -125,13 +125,7 @@ export default class SeedSignerTron {
     this._init(deriveAndScrub(master, indexes), path)
   }
 
-  /**
-   * Binds the signer to an HD node.
-   *
-   * @private
-   * @param {HDKey} node - The HD node at the signer's path.
-   * @param {string} path - The signer's absolute path.
-   */
+  /** @private */
   _init (node, path) {
     /** @private */
     this._node = node

@@ -110,13 +110,7 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @throws {DisposalError} If the signer has been disposed.
      */
     getAccountByPath(path: string, options?: AccountOptions): Promise<WalletAccountTron>;
-    /**
-     * Builds the account config, injecting the manager's shared tron web client so accounts
-     * reuse it instead of opening their own.
-     *
-     * @private
-     * @returns {TronWalletConfig} The account configuration.
-     */
+    /** @private */
     private _accountConfig;
     /**
      * Disposes all wallet accounts, and the default signer if the manager built it from a seed.

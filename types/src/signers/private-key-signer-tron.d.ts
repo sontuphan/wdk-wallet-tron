@@ -16,19 +16,9 @@ export default class PrivateKeySignerTron implements ISignerTron {
      * @throws {ValueError} If the key is not a valid secp256k1 private key.
      */
     constructor(privateKey: string | Uint8Array);
-    /**
-     * Raw secp256k1 private key bytes (32 bytes), owned by the signer.
-     *
-     * @private
-     * @type {Uint8Array | undefined}
-     */
+    /** @private */
     private _rawPrivateKey;
-    /**
-     * Compressed secp256k1 public key bytes (33 bytes).
-     *
-     * @private
-     * @type {Uint8Array}
-     */
+    /** @private */
     private _rawPublicKey;
     /** @private */
     private _address;

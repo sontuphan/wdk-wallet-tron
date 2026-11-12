@@ -45,12 +45,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @type {TronWalletConfig}
      */
     protected _config: TronWalletConfig;
-    /**
-     * The tron signer.
-     *
-     * @private
-     * @type {ISignerTron}
-     */
+    /** @private */
     private _signer;
     /**
      * If true, disposes the signer on calls to the 'dispose' method.

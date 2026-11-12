@@ -202,13 +202,7 @@ export default class WalletManagerTron extends WalletManager {
     return this._accounts[key]
   }
 
-  /**
-   * Builds the account config, injecting the manager's shared tron web client so accounts
-   * reuse it instead of opening their own.
-   *
-   * @private
-   * @returns {TronWalletConfig} The account configuration.
-   */
+  /** @private */
   _accountConfig () {
     return { ...this._config, provider: this._tronWeb }
   }

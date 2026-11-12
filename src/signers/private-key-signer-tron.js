@@ -82,20 +82,10 @@ export default class PrivateKeySignerTron {
   constructor (privateKey) {
     const key = copyPrivateKey(privateKey)
 
-    /**
-     * Raw secp256k1 private key bytes (32 bytes), owned by the signer.
-     *
-     * @private
-     * @type {Uint8Array | undefined}
-     */
+    /** @private */
     this._rawPrivateKey = key
 
-    /**
-     * Compressed secp256k1 public key bytes (33 bytes).
-     *
-     * @private
-     * @type {Uint8Array}
-     */
+    /** @private */
     this._rawPublicKey = secp256k1.getPublicKey(key, true)
 
     /** @private */

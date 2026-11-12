@@ -27,13 +27,7 @@ export default class SeedSignerTron implements ISignerTron {
      * @throws {ValueError} If the seed phrase is invalid, if the seed is not 16 to 64 bytes, or if the path is not valid.
      */
     constructor(seed: string | Uint8Array, path?: string);
-    /**
-     * Binds the signer to an HD node.
-     *
-     * @private
-     * @param {HDKey} node - The HD node at the signer's path.
-     * @param {string} path - The signer's absolute path.
-     */
+    /** @private */
     private _init;
     /** @private */
     private _node;
