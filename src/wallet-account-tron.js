@@ -96,7 +96,13 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
         ]
       : [seedOrSigner, pathOrConfig]
 
-    super(undefined, configuration)
+    try {
+      super(undefined, configuration)
+    } catch (error) {
+      if (isSeed) signer.dispose()
+
+      throw error
+    }
 
     /**
      * The tron wallet account configuration.
