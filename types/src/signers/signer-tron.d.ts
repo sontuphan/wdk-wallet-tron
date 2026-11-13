@@ -1,13 +1,13 @@
 /**
  * Parses a BIP-32 derivation path into child indexes.
  *
- * @param {string} path - The derivation path; absolute ("m" or "m/...") if `options.requireAbsolute` is true, relative (e.g. "0'/0/0") otherwise.
+ * @param {string} path - The derivation path, absolute ("m" or "m/...") or relative.
  * @param {Object} [options] - The parsing options.
- * @param {boolean} [options.requireAbsolute] - If true, the path must be absolute (default: false).
+ * @param {boolean} [options.requireAbsolute] - If true, the path must also be absolute (default: false).
  * @returns {number[]} The child indexes, with the hardened offset added to hardened ones.
- * @throws {ValueError} If the path is not valid.
+ * @throws {ValueError} If the path is required to be absolute and is not, or if it is not a valid BIP-32 path.
  */
-export function parseDerivationPath(path: string, { requireAbsolute }?: {
+export function parseDerivationPath(path: string, options?: {
     requireAbsolute?: boolean;
 }): number[];
 /**

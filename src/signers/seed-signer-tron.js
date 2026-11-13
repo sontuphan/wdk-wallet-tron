@@ -177,12 +177,16 @@ export default class SeedSignerTron {
    *
    * @param {string} relPath - The path to derive, relative to this signer's own path.
    * @returns {Promise<SeedSignerTron>} The derived child signer.
-   * @throws {ValueError} If the path is not valid.
+   * @throws {ValueError} If the path is absolute or not a valid BIP-32 path.
    * @throws {DisposalError} If the signer has been disposed.
    */
   async derive (relPath) {
     if (this._disposed) {
       throw new DisposalError('The signer has been disposed.')
+    }
+
+    if (relPath === 'm' || relPath.startsWith('m/')) {
+      throw new ValueError('The derivation path must be relative (e.g. "0\'/0/0").')
     }
 
     const [first, ...rest] = parseDerivationPath(relPath)

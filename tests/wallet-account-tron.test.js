@@ -122,7 +122,7 @@ describe('WalletAccountTron', () => {
 
     test('should throw if the path is invalid', () => {
       expect(() => { new WalletAccountTron(SEED_PHRASE, "a'/b/c") })
-        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path "44\'/195\'/a\'/b/c" has an invalid child index: "a\'".' }))
+        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path is not a valid BIP-32 path.' }))
     })
 
     test('should default to the first account if only a seed and a config are given', async () => {

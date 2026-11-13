@@ -36,36 +36,32 @@ const TRANSACTION_ID_PATTERN = /^[0-9a-fA-F]{64}$/
 /**
  * Parses a BIP-32 derivation path into child indexes.
  *
- * @param {string} path - The derivation path; absolute ("m" or "m/...") if `options.requireAbsolute` is true, relative (e.g. "0'/0/0") otherwise.
+ * @param {string} path - The derivation path, absolute ("m" or "m/...") or relative.
  * @param {Object} [options] - The parsing options.
- * @param {boolean} [options.requireAbsolute] - If true, the path must be absolute (default: false).
+ * @param {boolean} [options.requireAbsolute] - If true, the path must also be absolute (default: false).
  * @returns {number[]} The child indexes, with the hardened offset added to hardened ones.
- * @throws {ValueError} If the path is not valid.
+ * @throws {ValueError} If the path is required to be absolute and is not, or if it is not a valid BIP-32 path.
  */
-export function parseDerivationPath (path, { requireAbsolute = false } = {}) {
-  if (requireAbsolute) {
-    if (path === 'm') {
-      return []
-    }
-
-    if (!path.startsWith('m/')) {
-      throw new ValueError(`The derivation path must be absolute (e.g. "m/44'/195'"), got "${path}".`)
-    }
-
-    path = path.slice(2)
+export function parseDerivationPath (path, options = {}) {
+  if (path === 'm') {
+    return []
   }
 
-  return path.split('/').map((segment) => {
-    const match = /^(0|[1-9]\d*)(')?$/.exec(segment)
+  const { requireAbsolute = false } = options
 
-    const index = match ? Number(match[1]) : NaN
+  const isAbsolute = path.startsWith('m/')
 
-    if (!Number.isSafeInteger(index) || index >= HARDENED_OFFSET) {
-      throw new ValueError(`The derivation path "${path}" has an invalid child index: "${segment}".`)
-    }
+  if (requireAbsolute && !isAbsolute) {
+    throw new ValueError('The derivation path must be absolute (e.g. "m/44\'/195\'").')
+  }
 
-    return match[2] ? index + HARDENED_OFFSET : index
-  })
+  const segments = (isAbsolute ? path.slice(2) : path).split('/')
+
+  if (!segments.every((segment) => /^\d+'?$/.test(segment) && parseInt(segment) < 2 ** 31)) {
+    throw new ValueError('The derivation path is not a valid BIP-32 path.')
+  }
+
+  return segments.map((segment) => segment.endsWith("'") ? HARDENED_OFFSET + parseInt(segment) : parseInt(segment))
 }
 
 /**

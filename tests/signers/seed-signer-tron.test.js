@@ -89,16 +89,16 @@ describe('SeedSignerTron', () => {
 
     test('should throw if the path is not absolute', () => {
       expect(() => new SeedSignerTron(SEED_PHRASE, "44'/195'"))
-        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path must be absolute (e.g. "m/44\'/195\'"), got "44\'/195\'".' }))
+        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path must be absolute (e.g. "m/44\'/195\'").' }))
     })
 
     test.each([
-      ["m/44'/a'", 'The derivation path "44\'/a\'" has an invalid child index: "a\'".'],
-      ["m/44'/2147483648'", 'The derivation path "44\'/2147483648\'" has an invalid child index: "2147483648\'".'],
-      ["m/44'/0195'", 'The derivation path "44\'/0195\'" has an invalid child index: "0195\'".']
-    ])('should throw if the path %s has an invalid child index', (path, message) => {
+      "m/44'/a'",
+      "m/44'/2147483648'",
+      "m/44'/-1"
+    ])('should throw if the path %s is not a valid BIP-32 path', (path) => {
       expect(() => new SeedSignerTron(SEED_PHRASE, path))
-        .toThrow(expect.objectContaining({ constructor: ValueError, message }))
+        .toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path is not a valid BIP-32 path.' }))
     })
   })
 
@@ -157,15 +157,24 @@ describe('SeedSignerTron', () => {
     })
 
     test.each([
-      ["a'/b/c", 'The derivation path "a\'/b/c" has an invalid child index: "a\'".'],
-      ['-1', 'The derivation path "-1" has an invalid child index: "-1".'],
-      ["m/0'", 'The derivation path "m/0\'" has an invalid child index: "m".'],
-      ["0'/0/01", 'The derivation path "0\'/0/01" has an invalid child index: "01".']
-    ])('should throw if the path %s is not valid', async (path, message) => {
+      "a'/b/c",
+      '-1',
+      "0'/0/2147483648"
+    ])('should throw if the path %s is not a valid BIP-32 path', async (path) => {
       const root = new SeedSignerTron(SEED_PHRASE)
 
       await expect(root.derive(path))
-        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message }))
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path is not a valid BIP-32 path.' }))
+    })
+
+    test.each([
+      'm',
+      "m/0'/0/0"
+    ])('should throw if the path %s is absolute', async (path) => {
+      const root = new SeedSignerTron(SEED_PHRASE)
+
+      await expect(root.derive(path))
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path must be relative (e.g. "0\'/0/0").' }))
     })
   })
 

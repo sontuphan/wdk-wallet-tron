@@ -59,7 +59,7 @@ export default class SeedSignerTron implements ISignerTron {
      *
      * @param {string} relPath - The path to derive, relative to this signer's own path.
      * @returns {Promise<SeedSignerTron>} The derived child signer.
-     * @throws {ValueError} If the path is not valid.
+     * @throws {ValueError} If the path is absolute or not a valid BIP-32 path.
      * @throws {DisposalError} If the signer has been disposed.
      */
     derive(relPath: string): Promise<SeedSignerTron>;

@@ -317,7 +317,7 @@ describe('WalletManagerTron', () => {
 
     test('should throw if the index is a negative number', async () => {
       await expect(wallet.getAccount(-1))
-        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path "0\'/0/-1" has an invalid child index: "-1".' }))
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path is not a valid BIP-32 path.' }))
     })
   })
 
@@ -330,7 +330,7 @@ describe('WalletManagerTron', () => {
 
     test('should throw if the path is invalid', async () => {
       await expect(wallet.getAccountByPath("a'/b/c"))
-        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path "a\'/b/c" has an invalid child index: "a\'".' }))
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path is not a valid BIP-32 path.' }))
     })
   })
 
