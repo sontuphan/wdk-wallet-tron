@@ -201,11 +201,15 @@ export default class WalletManagerTron extends WalletManager {
 
       if (this._accounts[key]) {
         signer.dispose()
+      } else {
+        try {
+          this._accounts[key] = new WalletAccountTron(signer, { ...this._accountConfig(), shouldWipeSignerOnDisposal: true })
+        } catch (error) {
+          signer.dispose()
 
-        return this._accounts[key]
+          throw error
+        }
       }
-
-      this._accounts[key] = new WalletAccountTron(signer, { ...this._accountConfig(), shouldWipeSignerOnDisposal: true })
     }
 
     return this._accounts[key]
