@@ -56,6 +56,7 @@ function scrub (node) {
 
   node.privKeyBytes = undefined
   node.privKey = undefined
+  node.chainCode = null
 }
 
 /**
