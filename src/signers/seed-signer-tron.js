@@ -15,7 +15,7 @@
 'use strict'
 
 import * as bip39 from 'bip39'
-import { HDKey } from '@scure/bip32'
+import { HARDENED_OFFSET, HDKey } from '@scure/bip32'
 
 // eslint-disable-next-line camelcase
 import { sodium_memzero } from 'sodium-universal'
@@ -60,20 +60,32 @@ function scrub (node) {
 }
 
 /**
- * Derives an HD node along the given child indexes, erasing every node it leaves behind,
+ * Returns the child index of a path segment.
+ *
+ * @param {string} segment - The path segment (e.g. "44'" or "0").
+ * @returns {number} The child index, with the hardened offset added if the segment is hardened.
+ */
+function toChildIndex (segment) {
+  const index = parseInt(segment, 10)
+
+  return segment.endsWith("'") ? HARDENED_OFFSET + index : index
+}
+
+/**
+ * Derives an HD node along the given path segments, erasing every node it leaves behind,
  * including the starting one, so that only the returned node holds key material. A node is
  * erased even when deriving its child throws, so a failed derivation leaves no key material behind.
  *
  * @param {HDKey} node - The starting HD node.
- * @param {number[]} indexes - The child indexes to derive.
+ * @param {string[]} segments - The path segments to derive.
  * @returns {HDKey} The HD node at the end of the path.
  */
-function deriveAndScrub (node, indexes) {
-  for (const index of indexes) {
+function deriveAndScrub (node, segments) {
+  for (const segment of segments) {
     let child
 
     try {
-      child = node.deriveChild(index)
+      child = node.deriveChild(toChildIndex(segment))
     } finally {
       scrub(node)
     }
@@ -116,10 +128,10 @@ export default class SeedSignerTron {
 
     const seedBytes = ownsSeed ? bip39.mnemonicToSeedSync(seed) : seed
 
-    let indexes, master
+    let segments, master
 
     try {
-      indexes = parseDerivationPath(path, { requireAbsolute: true })
+      segments = parseDerivationPath(path, { requireAbsolute: true })
 
       master = HDKey.fromMasterSeed(seedBytes)
     } finally {
@@ -128,7 +140,7 @@ export default class SeedSignerTron {
       }
     }
 
-    this._init(path, deriveAndScrub(master, indexes))
+    this._init(path, deriveAndScrub(master, segments))
   }
 
   /**
@@ -193,7 +205,7 @@ export default class SeedSignerTron {
 
     const [first, ...rest] = parseDerivationPath(relPath)
 
-    const node = deriveAndScrub(this._node.deriveChild(first), rest)
+    const node = deriveAndScrub(this._node.deriveChild(toChildIndex(first)), rest)
 
     const signer = Object.create(SeedSignerTron.prototype)
     signer._init(`${this._path}/${relPath}`, node)

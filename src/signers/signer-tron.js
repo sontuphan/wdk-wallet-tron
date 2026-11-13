@@ -19,7 +19,6 @@ import { TronWeb } from 'tronweb'
 // eslint-disable-next-line camelcase
 import { keccak_256 } from '@noble/hashes/sha3'
 import { secp256k1 } from '@noble/curves/secp256k1'
-import { HARDENED_OFFSET } from '@scure/bip32'
 
 import { ISigner, NotImplementedError, ValueError } from '@tetherto/wdk-wallet'
 
@@ -34,13 +33,13 @@ const ADDRESS_HASH_OFFSET_IN_BYTES = 12
 const TRANSACTION_ID_PATTERN = /^[0-9a-fA-F]{64}$/
 
 /**
- * Parses a BIP-32 derivation path into child indexes.
+ * Parses a BIP-32 derivation path into its segments.
  *
  * @internal
  * @param {string} path - The derivation path, absolute ("m" or "m/...") or relative.
  * @param {Object} [options] - The parsing options.
  * @param {boolean} [options.requireAbsolute] - If true, the path must also be absolute (default: false).
- * @returns {number[]} The child indexes, with the hardened offset added to hardened ones.
+ * @returns {string[]} The path segments (e.g. ["44'", "195'"]), without the leading "m".
  * @throws {ValueError} If the path is required to be absolute and is not, or if it is not a valid BIP-32 path.
  */
 export function parseDerivationPath (path, options = {}) {
@@ -62,7 +61,7 @@ export function parseDerivationPath (path, options = {}) {
     throw new ValueError('The derivation path is not a valid BIP-32 path.')
   }
 
-  return segments.map((segment) => segment.endsWith("'") ? HARDENED_OFFSET + parseInt(segment) : parseInt(segment))
+  return segments
 }
 
 /**
