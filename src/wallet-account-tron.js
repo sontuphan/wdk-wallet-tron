@@ -140,7 +140,15 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {ValueError} If the private key is not valid.
    */
   static fromPrivateKey (privateKey, config = {}) {
-    return new WalletAccountTron(new PrivateKeySignerTron(privateKey), { ...config, shouldWipeSignerOnDisposal: true })
+    const signer = new PrivateKeySignerTron(privateKey)
+
+    try {
+      return new WalletAccountTron(signer, { ...config, shouldWipeSignerOnDisposal: true })
+    } catch (error) {
+      signer.dispose()
+
+      throw error
+    }
   }
 
   /**
