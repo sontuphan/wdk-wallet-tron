@@ -161,6 +161,8 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
     /** @private */
     private _disposed;
     /** @private */
+    private _guardDisposed;
+    /** @private */
     private _assertTransactionOwner;
     /** @private */
     private _isConsistentTransaction;

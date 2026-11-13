@@ -97,6 +97,8 @@ export default class SeedSignerTron implements ISignerTron {
     private _address;
     /** @private */
     private _disposed;
+    /** @private */
+    private _guardDisposed;
 }
 export type ISignerTron = import("./signer-tron.js").ISignerTron;
 export type KeyPair = import("@tetherto/wdk-wallet").KeyPair;

@@ -204,9 +204,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {DisposalError} If the wallet account has been disposed.
    */
   async sign (message) {
-    if (this._disposed) {
-      throw new DisposalError('The wallet account has been disposed.')
-    }
+    this._guardDisposed()
 
     return await this._signer.sign(message)
   }
@@ -221,9 +219,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async signTransaction (tx) {
-    if (this._disposed) {
-      throw new DisposalError('The wallet account has been disposed.')
-    }
+    this._guardDisposed()
 
     if (!this._tronWeb) {
       throw new ProviderRequiredError('The wallet must be connected to tron web to sign transactions.')
@@ -260,9 +256,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async sendTransaction (tx) {
-    if (this._disposed) {
-      throw new DisposalError('The wallet account has been disposed.')
-    }
+    this._guardDisposed()
 
     if (!this._tronWeb) {
       throw new ProviderRequiredError('The wallet must be connected to tron web to send transactions.')
@@ -293,9 +287,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async transfer ({ token, recipient, amount }) {
-    if (this._disposed) {
-      throw new DisposalError('The wallet account has been disposed.')
-    }
+    this._guardDisposed()
 
     if (!this._tronWeb) {
       throw new ProviderRequiredError('The wallet must be connected to tron web to transfer tokens.')
@@ -338,9 +330,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
   async approve (options) {
-    if (this._disposed) {
-      throw new DisposalError('The wallet account has been disposed.')
-    }
+    this._guardDisposed()
 
     if (!this._tronWeb) {
       throw new ProviderRequiredError('The wallet must be connected to tron web to approve funds.')
@@ -387,6 +377,13 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
     }
 
     this._disposed = true
+  }
+
+  /** @private */
+  _guardDisposed () {
+    if (this.disposed) {
+      throw new DisposalError('The wallet account has been disposed.')
+    }
   }
 
   /** @private */

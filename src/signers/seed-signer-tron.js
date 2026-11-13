@@ -195,9 +195,7 @@ export default class SeedSignerTron {
    * @throws {DisposalError} If the signer has been disposed.
    */
   async derive (relPath) {
-    if (this._disposed) {
-      throw new DisposalError('The signer has been disposed.')
-    }
+    this._guardDisposed()
 
     if (relPath === 'm' || relPath.startsWith('m/')) {
       throw new ValueError('The derivation path must be relative (e.g. "0\'/0/0").')
@@ -230,9 +228,7 @@ export default class SeedSignerTron {
    * @throws {DisposalError} If the signer has been disposed.
    */
   async sign (message) {
-    if (this._disposed) {
-      throw new DisposalError('The signer has been disposed.')
-    }
+    this._guardDisposed()
 
     return signMessage(this._node.privateKey, message)
   }
@@ -246,9 +242,7 @@ export default class SeedSignerTron {
    * @throws {DisposalError} If the signer has been disposed.
    */
   async signTransaction (unsignedTx) {
-    if (this._disposed) {
-      throw new DisposalError('The signer has been disposed.')
-    }
+    this._guardDisposed()
 
     return signTransaction(this._node.privateKey, unsignedTx)
   }
@@ -261,6 +255,13 @@ export default class SeedSignerTron {
     scrub(this._node)
 
     this._disposed = true
+  }
+
+  /** @private */
+  _guardDisposed () {
+    if (this.disposed) {
+      throw new DisposalError('The signer has been disposed.')
+    }
   }
 
   /** @private */
