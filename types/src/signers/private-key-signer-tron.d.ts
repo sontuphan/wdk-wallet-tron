@@ -66,14 +66,14 @@ export default class PrivateKeySignerTron implements ISignerTron {
      */
     sign(message: string): Promise<string>;
     /**
-     * Signs a transaction, keeping any signatures it already carries.
+     * Signs a transaction.
      *
-     * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
-     * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
+     * @param {Transaction} unsignedTx - The unsigned tron web transaction.
+     * @returns {Promise<SignedTransaction>} The signed transaction.
      * @throws {ValueError} If the transaction id is not a 32-byte hex string.
      * @throws {DisposalError} If the signer has been disposed.
      */
-    signTransaction(transaction: Transaction | SignedTransaction): Promise<SignedTransaction>;
+    signTransaction(unsignedTx: Transaction): Promise<SignedTransaction>;
     /**
      * Disposes the object along with all its data (cleaning up any sensitive field from memory): for a private-key signer,
      * its internal copy of the private key.

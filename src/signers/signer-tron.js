@@ -107,19 +107,19 @@ export function signMessage (privateKey, message) {
 }
 
 /**
- * Signs a transaction's id with a raw secp256k1 private key, keeping the signatures it already carries.
+ * Signs a transaction's id with a raw secp256k1 private key.
  *
  * @param {Uint8Array} privateKey - The raw private key (32 bytes).
- * @param {Transaction | SignedTransaction} transaction - The transaction.
- * @returns {SignedTransaction} The transaction with the key's signature appended.
+ * @param {Transaction} unsignedTx - The unsigned transaction.
+ * @returns {SignedTransaction} The signed transaction.
  * @throws {ValueError} If the transaction id is not a 32-byte hex string.
  */
-export function signTransaction (privateKey, transaction) {
-  if (!TRANSACTION_ID_PATTERN.test(transaction.txID)) {
+export function signTransaction (privateKey, unsignedTx) {
+  if (!TRANSACTION_ID_PATTERN.test(unsignedTx.txID)) {
     throw new ValueError('The transaction id must be a 32-byte hex string.')
   }
 
-  const transactionBytes = Buffer.from(transaction.txID, 'hex')
+  const transactionBytes = Buffer.from(unsignedTx.txID, 'hex')
 
   const signature = secp256k1.sign(transactionBytes, privateKey, { lowS: true })
 
@@ -129,11 +129,9 @@ export function signTransaction (privateKey, transaction) {
 
   const serializedSignature = r + s + v
 
-  const signatures = 'signature' in transaction ? transaction.signature ?? [] : []
-
   return {
-    ...transaction,
-    signature: [...signatures, serializedSignature]
+    ...unsignedTx,
+    signature: [serializedSignature]
   }
 }
 
@@ -157,14 +155,14 @@ export class ISignerTron extends ISigner {
   }
 
   /**
-   * Signs a transaction, keeping any signatures it already carries.
+   * Signs a transaction.
    *
-   * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
-   * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
+   * @param {Transaction} unsignedTx - The unsigned tron web transaction.
+   * @returns {Promise<SignedTransaction>} The signed transaction.
    * @throws {ValueError} If the transaction id is not a 32-byte hex string.
    * @throws {DisposalError} If the signer has been disposed.
    */
-  async signTransaction (transaction) {
-    throw new NotImplementedError('signTransaction(transaction)')
+  async signTransaction (unsignedTx) {
+    throw new NotImplementedError('signTransaction(unsignedTx)')
   }
 }

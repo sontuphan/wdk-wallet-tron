@@ -173,19 +173,19 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * Signs a transaction, keeping any signatures it already carries.
+   * Signs a transaction.
    *
-   * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
-   * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
+   * @param {Transaction} unsignedTx - The unsigned tron web transaction.
+   * @returns {Promise<SignedTransaction>} The signed transaction.
    * @throws {ValueError} If the transaction id is not a 32-byte hex string.
    * @throws {DisposalError} If the signer has been disposed.
    */
-  async signTransaction (transaction) {
+  async signTransaction (unsignedTx) {
     if (this._disposed) {
       throw new DisposalError('The signer has been disposed.')
     }
 
-    return signTransaction(this._rawPrivateKey, transaction)
+    return signTransaction(this._rawPrivateKey, unsignedTx)
   }
 
   /**

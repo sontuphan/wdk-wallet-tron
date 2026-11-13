@@ -10,6 +10,6 @@ describe('ISignerTron', () => {
   })
 
   test('should throw a not implemented error from signTransaction', async () => {
-    await expect(new ISignerTron().signTransaction({})).rejects.toThrow(expect.objectContaining({ constructor: NotImplementedError, message: "Method 'signTransaction(transaction)' is not implemented." }))
+    await expect(new ISignerTron().signTransaction({})).rejects.toThrow(expect.objectContaining({ constructor: NotImplementedError, message: "Method 'signTransaction(unsignedTx)' is not implemented." }))
   })
 })

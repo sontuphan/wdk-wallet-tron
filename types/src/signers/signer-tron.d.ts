@@ -26,14 +26,14 @@ export function getTronAddress(publicKey: Uint8Array): string;
  */
 export function signMessage(privateKey: Uint8Array, message: string): string;
 /**
- * Signs a transaction's id with a raw secp256k1 private key, keeping the signatures it already carries.
+ * Signs a transaction's id with a raw secp256k1 private key.
  *
  * @param {Uint8Array} privateKey - The raw private key (32 bytes).
- * @param {Transaction | SignedTransaction} transaction - The transaction.
- * @returns {SignedTransaction} The transaction with the key's signature appended.
+ * @param {Transaction} unsignedTx - The unsigned transaction.
+ * @returns {SignedTransaction} The signed transaction.
  * @throws {ValueError} If the transaction id is not a 32-byte hex string.
  */
-export function signTransaction(privateKey: Uint8Array, transaction: Transaction | SignedTransaction): SignedTransaction;
+export function signTransaction(privateKey: Uint8Array, unsignedTx: Transaction): SignedTransaction;
 /** @typedef {import('@tetherto/wdk-wallet').DisposalError} DisposalError */
 /** @typedef {import('@tetherto/wdk-wallet').UnsupportedOperationError} UnsupportedOperationError */
 /** @typedef {import('tronweb').Types.Transaction} Transaction */
@@ -55,14 +55,14 @@ export interface ISignerTron extends ISigner {
      */
     derive(path: string): Promise<ISignerTron>;
     /**
-     * Signs a transaction, keeping any signatures it already carries.
+     * Signs a transaction.
      *
-     * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
-     * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
+     * @param {Transaction} unsignedTx - The unsigned tron web transaction.
+     * @returns {Promise<SignedTransaction>} The signed transaction.
      * @throws {ValueError} If the transaction id is not a 32-byte hex string.
      * @throws {DisposalError} If the signer has been disposed.
      */
-    signTransaction(transaction: Transaction | SignedTransaction): Promise<SignedTransaction>;
+    signTransaction(unsignedTx: Transaction): Promise<SignedTransaction>;
 }
 export type DisposalError = import("@tetherto/wdk-wallet").DisposalError;
 export type UnsupportedOperationError = import("@tetherto/wdk-wallet").UnsupportedOperationError;

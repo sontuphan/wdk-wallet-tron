@@ -200,19 +200,6 @@ describe('SeedSignerTron', () => {
         signature: [ACCOUNT_0_TRANSACTION_SIGNATURE]
       })
     })
-
-    test('should keep the signatures the transaction already carries', async () => {
-      const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT_1.path)
-
-      const transaction = { ...TRANSACTION, signature: [ACCOUNT_0_TRANSACTION_SIGNATURE] }
-
-      expect(await signer.signTransaction(transaction)).toEqual({
-        ...TRANSACTION,
-        signature: [ACCOUNT_0_TRANSACTION_SIGNATURE, ACCOUNT_1_TRANSACTION_SIGNATURE]
-      })
-
-      expect(transaction.signature).toEqual([ACCOUNT_0_TRANSACTION_SIGNATURE])
-    })
   })
 
   describe('dispose', () => {
