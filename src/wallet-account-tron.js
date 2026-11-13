@@ -14,7 +14,7 @@
 
 'use strict'
 
-import { DisposalError, MaximumFeeExceededError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
+import { DisposalError, MaximumFeeExceededError, ProviderRequiredError } from '@tetherto/wdk-wallet'
 
 import WalletAccountReadOnlyTron from './wallet-account-read-only-tron.js'
 
@@ -27,6 +27,7 @@ import PrivateKeySignerTron from './signers/private-key-signer-tron.js'
  */
 
 /** @typedef {import('@tetherto/wdk-wallet').KeyPair} KeyPair */
+/** @typedef {import('@tetherto/wdk-wallet').ValueError} ValueError */
 /** @typedef {import('@tetherto/wdk-wallet').TransactionResult} TransactionResult */
 /** @typedef {import('@tetherto/wdk-wallet').TransferOptions} TransferOptions */
 /** @typedef {import('@tetherto/wdk-wallet').TransferResult} TransferResult */
@@ -63,7 +64,6 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @overload
    * @param {ISignerTron} signer - The tron signer, derived to an account path.
    * @param {TronWalletConfig & SignerOptions} [config] - The configuration object.
-   * @throws {ValueError} If a derivation path is given along with the signer.
    */
 
   /**
@@ -101,10 +101,6 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
       signer = new SeedSignerTron(seedOrSigner, `${BIP_44_TRON_DERIVATION_PATH_PREFIX}/${path}`)
     } else {
-      if (typeof pathOrConfig === 'string') {
-        throw new ValueError('A derivation path cannot be given with a signer; derive the signer instead (e.g. signer.derive(path)).')
-      }
-
       config = pathOrConfig ?? config
     }
 
