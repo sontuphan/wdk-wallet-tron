@@ -69,7 +69,7 @@ export function parseDerivationPath (path, options = {}) {
  * Returns the tron address of a secp256k1 public key.
  *
  * @internal
- * @param {Uint8Array} publicKey - The public key (compressed or uncompressed).
+ * @param {string | Uint8Array} publicKey - The public key (compressed or uncompressed).
  * @returns {string} The address, in base58 format.
  */
 export function getTronAddress (publicKey) {
