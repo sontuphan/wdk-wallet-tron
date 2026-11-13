@@ -36,10 +36,6 @@ import { getTronAddress, parseDerivationPath, signMessage, signTransaction } fro
  */
 export const BIP_44_TRON_DERIVATION_PATH_PREFIX = "m/44'/195'"
 
-const MIN_SEED_LENGTH_IN_BYTES = 16
-
-const MAX_SEED_LENGTH_IN_BYTES = 64
-
 /**
  * Securely erases an HD node's private key and chain code from memory.
  *
@@ -118,12 +114,8 @@ export default class SeedSignerTron {
   constructor (seed, path = BIP_44_TRON_DERIVATION_PATH_PREFIX) {
     const ownsSeed = typeof seed === 'string'
 
-    if (ownsSeed) {
-      if (!bip39.validateMnemonic(seed)) {
-        throw new ValueError('The seed phrase is invalid.')
-      }
-    } else if (seed.length < MIN_SEED_LENGTH_IN_BYTES || seed.length > MAX_SEED_LENGTH_IN_BYTES) {
-      throw new ValueError(`The seed must be between ${MIN_SEED_LENGTH_IN_BYTES} and ${MAX_SEED_LENGTH_IN_BYTES} bytes.`)
+    if (ownsSeed && !bip39.validateMnemonic(seed)) {
+      throw new ValueError('The seed phrase is invalid.')
     }
 
     const seedBytes = ownsSeed ? bip39.mnemonicToSeedSync(seed) : seed
@@ -133,7 +125,15 @@ export default class SeedSignerTron {
     try {
       segments = parseDerivationPath(path, { requireAbsolute: true })
 
-      master = HDKey.fromMasterSeed(seedBytes)
+      try {
+        master = HDKey.fromMasterSeed(seedBytes)
+      } catch (error) {
+        if (error.message.startsWith('HDKey: seed length must be between 128 and 512 bits')) {
+          throw new ValueError('The seed must be between 16 and 64 bytes.', { cause: error })
+        }
+
+        throw error
+      }
     } finally {
       if (ownsSeed) {
         sodium_memzero(seedBytes)
