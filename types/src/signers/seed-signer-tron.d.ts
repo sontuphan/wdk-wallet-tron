@@ -3,10 +3,6 @@
 /** @typedef {import('tronweb').Types.Transaction} Transaction */
 /** @typedef {import('tronweb').Types.SignedTransaction} SignedTransaction */
 /**
- * Absolute BIP-44 prefix for Tron (m/purpose'/coin_type').
- */
-export const BIP_44_TRON_DERIVATION_PATH_PREFIX: "m/44'/195'";
-/**
  * Signer implementation that derives keys from a BIP-39 seed using a BIP-32 path.
  *
  * Every signer holds exactly one HD node (the Tron BIP-44 coin node "m/44'/195'" by default, ready to

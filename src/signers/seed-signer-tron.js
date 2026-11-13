@@ -31,6 +31,8 @@ import { getTronAddress, parseDerivationPath, signMessage, signTransaction } fro
 
 /**
  * Absolute BIP-44 prefix for Tron (m/purpose'/coin_type').
+ *
+ * @internal
  */
 export const BIP_44_TRON_DERIVATION_PATH_PREFIX = "m/44'/195'"
 

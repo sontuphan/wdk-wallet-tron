@@ -1,39 +1,3 @@
-/**
- * Parses a BIP-32 derivation path into child indexes.
- *
- * @param {string} path - The derivation path, absolute ("m" or "m/...") or relative.
- * @param {Object} [options] - The parsing options.
- * @param {boolean} [options.requireAbsolute] - If true, the path must also be absolute (default: false).
- * @returns {number[]} The child indexes, with the hardened offset added to hardened ones.
- * @throws {ValueError} If the path is required to be absolute and is not, or if it is not a valid BIP-32 path.
- */
-export function parseDerivationPath(path: string, options?: {
-    requireAbsolute?: boolean;
-}): number[];
-/**
- * Returns the tron address of a secp256k1 public key.
- *
- * @param {Uint8Array} publicKey - The public key (compressed or uncompressed).
- * @returns {string} The address, in base58 format.
- */
-export function getTronAddress(publicKey: Uint8Array): string;
-/**
- * Signs a message with a raw secp256k1 private key, using the TRON signed message prefix.
- *
- * @param {Uint8Array} privateKey - The raw private key (32 bytes).
- * @param {string} message - The message to sign.
- * @returns {string} The message's signature, as a 0x-prefixed hex string.
- */
-export function signMessage(privateKey: Uint8Array, message: string): string;
-/**
- * Signs a transaction's id with a raw secp256k1 private key.
- *
- * @param {Uint8Array} privateKey - The raw private key (32 bytes).
- * @param {Transaction} unsignedTx - The unsigned transaction.
- * @returns {SignedTransaction} The signed transaction.
- * @throws {ValueError} If the transaction id is not a 32-byte hex string.
- */
-export function signTransaction(privateKey: Uint8Array, unsignedTx: Transaction): SignedTransaction;
 /** @typedef {import('@tetherto/wdk-wallet').DisposalError} DisposalError */
 /** @typedef {import('@tetherto/wdk-wallet').UnsupportedOperationError} UnsupportedOperationError */
 /** @typedef {import('tronweb').Types.Transaction} Transaction */

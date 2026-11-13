@@ -36,6 +36,7 @@ const TRANSACTION_ID_PATTERN = /^[0-9a-fA-F]{64}$/
 /**
  * Parses a BIP-32 derivation path into child indexes.
  *
+ * @internal
  * @param {string} path - The derivation path, absolute ("m" or "m/...") or relative.
  * @param {Object} [options] - The parsing options.
  * @param {boolean} [options.requireAbsolute] - If true, the path must also be absolute (default: false).
@@ -67,6 +68,7 @@ export function parseDerivationPath (path, options = {}) {
 /**
  * Returns the tron address of a secp256k1 public key.
  *
+ * @internal
  * @param {Uint8Array} publicKey - The public key (compressed or uncompressed).
  * @returns {string} The address, in base58 format.
  */
@@ -85,6 +87,7 @@ export function getTronAddress (publicKey) {
 /**
  * Signs a message with a raw secp256k1 private key, using the TRON signed message prefix.
  *
+ * @internal
  * @param {Uint8Array} privateKey - The raw private key (32 bytes).
  * @param {string} message - The message to sign.
  * @returns {string} The message's signature, as a 0x-prefixed hex string.
@@ -105,6 +108,7 @@ export function signMessage (privateKey, message) {
 /**
  * Signs a transaction's id with a raw secp256k1 private key.
  *
+ * @internal
  * @param {Uint8Array} privateKey - The raw private key (32 bytes).
  * @param {Transaction} unsignedTx - The unsigned transaction.
  * @returns {SignedTransaction} The signed transaction.
