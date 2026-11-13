@@ -29,39 +29,9 @@ import { ISigner, NotImplementedError, ValueError } from '@tetherto/wdk-wallet'
 /** @typedef {import('tronweb').Types.Transaction} Transaction */
 /** @typedef {import('tronweb').Types.SignedTransaction} SignedTransaction */
 
-/**
- * Interface for Tron signers.
- *
- * @interface
- */
-export class ISignerTron extends ISigner {
-  /**
-   * Derive a child signer using a relative path (e.g., "0'/0/0").
-   *
-   * @param {string} path - The relative derivation path.
-   * @returns {Promise<ISignerTron>} The derived signer.
-   * @throws {UnsupportedOperationError} If the signer does not support account derivation.
-   * @throws {ValueError} If the path is not valid.
-   * @throws {DisposalError} If the signer has been disposed.
-   * @throws {NotImplementedError} If the implementation does not override this method.
-   */
-  async derive (path) {
-    throw new NotImplementedError('derive(path)')
-  }
+const ADDRESS_HASH_OFFSET_IN_BYTES = 12
 
-  /**
-   * Signs a transaction, keeping any signatures it already carries.
-   *
-   * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
-   * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
-   * @throws {ValueError} If the transaction id is not a 32-byte hex string.
-   * @throws {DisposalError} If the signer has been disposed.
-   * @throws {NotImplementedError} If the implementation does not override this method.
-   */
-  async signTransaction (transaction) {
-    throw new NotImplementedError('signTransaction(transaction)')
-  }
-}
+const TRANSACTION_ID_PATTERN = /^[0-9a-fA-F]{64}$/
 
 /**
  * Parses a BIP-32 derivation path into child indexes.
@@ -97,8 +67,6 @@ export function parseDerivationPath (path, { requireAbsolute = false } = {}) {
     return match[2] ? index + HARDENED_OFFSET : index
   })
 }
-
-const ADDRESS_HASH_OFFSET_IN_BYTES = 12
 
 /**
  * Returns the tron address of a secp256k1 public key.
@@ -138,8 +106,6 @@ export function signMessage (privateKey, message) {
   return '0x' + hex
 }
 
-const TRANSACTION_ID_PATTERN = /^[0-9a-fA-F]{64}$/
-
 /**
  * Signs a transaction's id with a raw secp256k1 private key, keeping the signatures it already carries.
  *
@@ -168,5 +134,39 @@ export function signTransaction (privateKey, transaction) {
   return {
     ...transaction,
     signature: [...signatures, serializedSignature]
+  }
+}
+
+/**
+ * Interface for Tron signers.
+ *
+ * @interface
+ */
+export class ISignerTron extends ISigner {
+  /**
+   * Derive a child signer using a relative path (e.g., "0'/0/0").
+   *
+   * @param {string} path - The relative derivation path.
+   * @returns {Promise<ISignerTron>} The derived signer.
+   * @throws {UnsupportedOperationError} If the signer does not support account derivation.
+   * @throws {ValueError} If the path is not valid.
+   * @throws {DisposalError} If the signer has been disposed.
+   * @throws {NotImplementedError} If the implementation does not override this method.
+   */
+  async derive (path) {
+    throw new NotImplementedError('derive(path)')
+  }
+
+  /**
+   * Signs a transaction, keeping any signatures it already carries.
+   *
+   * @param {Transaction | SignedTransaction} transaction - The tron web transaction.
+   * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
+   * @throws {ValueError} If the transaction id is not a 32-byte hex string.
+   * @throws {DisposalError} If the signer has been disposed.
+   * @throws {NotImplementedError} If the implementation does not override this method.
+   */
+  async signTransaction (transaction) {
+    throw new NotImplementedError('signTransaction(transaction)')
   }
 }
