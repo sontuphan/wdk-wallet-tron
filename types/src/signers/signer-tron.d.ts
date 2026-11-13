@@ -52,7 +52,6 @@ export interface ISignerTron extends ISigner {
      * @throws {UnsupportedOperationError} If the signer does not support account derivation.
      * @throws {ValueError} If the path is not valid.
      * @throws {DisposalError} If the signer has been disposed.
-     * @throws {NotImplementedError} If the implementation does not override this method.
      */
     derive(path: string): Promise<ISignerTron>;
     /**
@@ -62,7 +61,6 @@ export interface ISignerTron extends ISigner {
      * @returns {Promise<SignedTransaction>} The transaction with this signer's signature appended.
      * @throws {ValueError} If the transaction id is not a 32-byte hex string.
      * @throws {DisposalError} If the signer has been disposed.
-     * @throws {NotImplementedError} If the implementation does not override this method.
      */
     signTransaction(transaction: Transaction | SignedTransaction): Promise<SignedTransaction>;
 }

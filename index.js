@@ -53,7 +53,6 @@ export {
   InvalidSignerError,
   MaximumFeeExceededError,
   NoSuchElementError,
-  NotImplementedError,
   ProviderRequiredError,
   TransferError,
   TransferErrorReason,
