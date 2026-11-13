@@ -28,11 +28,6 @@ import SeedSignerTron from './signers/seed-signer-tron.js'
 /** @typedef {import('./signers/signer-tron.js').ISignerTron} ISignerTron */
 /** @typedef {import('./signers/private-key-signer-tron.js').default} PrivateKeySignerTron */
 
-/**
- * @typedef {Object} AccountOptions
- * @property {string} [signerName] - The name of a signer registered via `addSigner`. Omit to use the default signer.
- */
-
 /** @extends {WalletManager<ISignerTron>} */
 export default class WalletManagerTron extends WalletManager {
   /**
@@ -120,7 +115,8 @@ export default class WalletManagerTron extends WalletManager {
    * const account = await wallet.getAccount(1);
    * @overload
    * @param {number} [index] - The index of the account to get (default: 0).
-   * @param {AccountOptions} [options] - Account options.
+   * @param {Object} [options] - Account options.
+   * @param {string} [options.signerName] - The name of a signer registered via `addSigner`. Omit to use the default signer.
    * @returns {Promise<WalletAccountTron>} The account.
    * @throws {ValueError} If the index is not an integer between 0 and 2^31 - 1.
    * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
@@ -175,7 +171,8 @@ export default class WalletManagerTron extends WalletManager {
    * // Returns the account with derivation path m/44'/195'/0'/0/1
    * const account = await wallet.getAccountByPath("0'/0/1");
    * @param {string} path - The derivation path (e.g. "0'/0/0").
-   * @param {AccountOptions} [options] - Account options.
+   * @param {Object} [options] - Account options.
+   * @param {string} [options.signerName] - The name of a signer registered via `addSigner`. Omit to use the default signer.
    * @returns {Promise<WalletAccountTron>} The account.
    * @throws {ValueError} If the path is not valid.
    * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.

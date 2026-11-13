@@ -53,7 +53,8 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * const account = await wallet.getAccount(1);
      * @overload
      * @param {number} [index] - The index of the account to get (default: 0).
-     * @param {AccountOptions} [options] - Account options.
+     * @param {Object} [options] - Account options.
+     * @param {string} [options.signerName] - The name of a signer registered via `addSigner`. Omit to use the default signer.
      * @returns {Promise<WalletAccountTron>} The account.
      * @throws {ValueError} If the index is not an integer between 0 and 2^31 - 1.
      * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
@@ -61,7 +62,9 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * @throws {DisposalError} If the wallet manager or the signer has been disposed.
      * @see https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
      */
-    getAccount(index?: number, options?: AccountOptions): Promise<WalletAccountTron>;
+    getAccount(index?: number, options?: {
+        signerName?: string;
+    }): Promise<WalletAccountTron>;
     /**
      * Returns the wallet account backed by a registered signer, without further derivation.
      * Use it for non-derivable signers, such as {@link PrivateKeySignerTron}.
@@ -83,14 +86,17 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
      * // Returns the account with derivation path m/44'/195'/0'/0/1
      * const account = await wallet.getAccountByPath("0'/0/1");
      * @param {string} path - The derivation path (e.g. "0'/0/0").
-     * @param {AccountOptions} [options] - Account options.
+     * @param {Object} [options] - Account options.
+     * @param {string} [options.signerName] - The name of a signer registered via `addSigner`. Omit to use the default signer.
      * @returns {Promise<WalletAccountTron>} The account.
      * @throws {ValueError} If the path is not valid.
      * @throws {NoSuchElementError} If a signer name is given but no signer is registered with that name.
      * @throws {InvalidSignerError} If the signer doesn't support account derivation.
      * @throws {DisposalError} If the wallet manager or the signer has been disposed.
      */
-    getAccountByPath(path: string, options?: AccountOptions): Promise<WalletAccountTron>;
+    getAccountByPath(path: string, options?: {
+        signerName?: string;
+    }): Promise<WalletAccountTron>;
     /**
      * Disposes all wallet accounts, clearing secret material from memory, and the default signer if the manager built it
      * from a seed. A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed. Calling it
@@ -132,11 +138,5 @@ export type FeeRates = import("@tetherto/wdk-wallet").FeeRates;
 export type TronWalletConfig = import("./wallet-account-tron.js").TronWalletConfig;
 export type ISignerTron = import("./signers/signer-tron.js").ISignerTron;
 export type PrivateKeySignerTron = import("./signers/private-key-signer-tron.js").default;
-export type AccountOptions = {
-    /**
-     * - The name of a signer registered via `addSigner`. Omit to use the default signer.
-     */
-    signerName?: string;
-};
 import WalletManager from '@tetherto/wdk-wallet';
 import WalletAccountTron from './wallet-account-tron.js';
