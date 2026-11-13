@@ -315,9 +315,9 @@ describe('WalletManagerTron', () => {
       expect(account.path).toBe("m/44'/195'/0'/0/3")
     })
 
-    test('should throw if the index is a negative number', async () => {
-      await expect(wallet.getAccount(-1))
-        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The derivation path is not a valid BIP-32 path.' }))
+    test.each([-1, 1.5, 2 ** 31])('should throw if the index is %d', async (index) => {
+      await expect(wallet.getAccount(index))
+        .rejects.toThrow(expect.objectContaining({ constructor: ValueError, message: 'The index must be an integer between 0 and 2^31 - 1.' }))
     })
   })
 

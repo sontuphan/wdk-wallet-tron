@@ -14,13 +14,12 @@
 
 'use strict'
 
-import WalletManager, { DisposalError, InvalidSignerError, ProviderRequiredError } from '@tetherto/wdk-wallet'
+import WalletManager, { DisposalError, InvalidSignerError, ProviderRequiredError, ValueError } from '@tetherto/wdk-wallet'
 
 import WalletAccountTron from './wallet-account-tron.js'
 import SeedSignerTron from './signers/seed-signer-tron.js'
 
 /** @typedef {import('@tetherto/wdk-wallet').FeeRates} FeeRates */
-/** @typedef {import('@tetherto/wdk-wallet').ValueError} ValueError */
 /** @typedef {import('@tetherto/wdk-wallet').NoSuchElementError} NoSuchElementError */
 
 /** @typedef {import('./wallet-account-tron.js').TronWalletConfig} TronWalletConfig */
@@ -159,6 +158,10 @@ export default class WalletManagerTron extends WalletManager {
       }
 
       return this._accounts[key]
+    }
+
+    if (!Number.isInteger(indexOrSignerName) || indexOrSignerName < 0 || indexOrSignerName >= 2 ** 31) {
+      throw new ValueError('The index must be an integer between 0 and 2^31 - 1.')
     }
 
     return await this.getAccountByPath(`0'/0/${indexOrSignerName}`, options)
