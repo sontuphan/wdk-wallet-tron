@@ -270,15 +270,6 @@ describe('WalletAccountTron', () => {
       expect(signer.disposed).toBe(false)
     })
 
-    test('should not expose the private key of a supplied signer once disposed', () => {
-      const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
-      const account = new WalletAccountTron(signer)
-
-      account.dispose()
-
-      expect(account.keyPair.privateKey).toBeNull()
-    })
-
     test('should still expose the public key of a supplied signer once disposed', () => {
       const signer = new SeedSignerTron(SEED_PHRASE, ACCOUNT.path)
       const account = new WalletAccountTron(signer)

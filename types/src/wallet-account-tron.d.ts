@@ -60,8 +60,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * it's strongly recommended to treat the key pair as a read-only view of the keys. While it's still technically possible to alter their
      * content, client code should never do so.
      *
-     * Null if the account's signer does not expose key material. Once the account is disposed, the private key is null, even
-     * if the signer is owned by the caller and still holds it.
+     * Null if the account's signer does not expose key material.
      *
      * @type {KeyPair | null}
      */
