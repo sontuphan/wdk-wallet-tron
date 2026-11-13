@@ -86,25 +86,17 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {ValueError} If the seed is not a valid seed or BIP-39 seed phrase.
    * @see https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
    */
-  constructor (seedOrSigner, pathOrConfig, config = {}) {
+  constructor (seedOrSigner, pathOrConfig = {}, config = {}) {
     const isSeed = typeof seedOrSigner === 'string' || seedOrSigner instanceof Uint8Array
+    const hasPath = typeof pathOrConfig === 'string'
+    const [signer, configuration] = isSeed
+      ? [
+          new SeedSignerTron(seedOrSigner, `${BIP_44_TRON_DERIVATION_PATH_PREFIX}/${hasPath ? pathOrConfig : DEFAULT_ACCOUNT_PATH}`),
+          hasPath ? config : pathOrConfig
+        ]
+      : [seedOrSigner, pathOrConfig]
 
-    let signer = seedOrSigner
-
-    if (isSeed) {
-      let path = pathOrConfig
-
-      if (typeof pathOrConfig !== 'string') {
-        path = DEFAULT_ACCOUNT_PATH
-        config = pathOrConfig ?? config
-      }
-
-      signer = new SeedSignerTron(seedOrSigner, `${BIP_44_TRON_DERIVATION_PATH_PREFIX}/${path}`)
-    } else {
-      config = pathOrConfig ?? config
-    }
-
-    super(undefined, config)
+    super(undefined, configuration)
 
     /**
      * The tron wallet account configuration.
@@ -112,7 +104,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
      * @protected
      * @type {TronWalletConfig}
      */
-    this._config = config
+    this._config = configuration
 
     /** @private */
     this._signer = signer
@@ -123,7 +115,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
      * @protected
      * @type {boolean}
      */
-    this._shouldWipeSignerOnDisposal = isSeed || Boolean(config.shouldWipeSignerOnDisposal)
+    this._shouldWipeSignerOnDisposal = isSeed || Boolean(configuration.shouldWipeSignerOnDisposal)
 
     /** @private */
     this._disposed = false
