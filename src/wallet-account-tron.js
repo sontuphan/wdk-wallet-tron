@@ -363,8 +363,8 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
   /**
    * Disposes the wallet account. The signer's private key is erased only if the account owns the signer (created from a
-   * seed or private key, or with `shouldWipeSignerOnDisposal`); a signer you supplied is left untouched. Calling it
-   * again has no effect.
+   * seed or private key, or with `shouldWipeSignerOnDisposal`); otherwise a signer you supplied is left untouched.
+   * Calling it again has no effect.
    */
   dispose () {
     if (this._disposed) {
