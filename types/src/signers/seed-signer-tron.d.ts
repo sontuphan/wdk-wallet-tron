@@ -83,8 +83,7 @@ export default class SeedSignerTron implements ISignerTron {
      */
     signTransaction(unsignedTx: Transaction): Promise<SignedTransaction>;
     /**
-     * Disposes the object along with all its data (cleaning up any sensitive field from memory): for a seed signer, its
-     * private key and chain code.
+     * Disposes the signer, erasing its private key and chain code from memory.
      */
     dispose(): void;
     /** @private */

@@ -184,8 +184,7 @@ export default class PrivateKeySignerTron {
   }
 
   /**
-   * Disposes the object along with all its data (cleaning up any sensitive field from memory): for a private-key signer,
-   * its internal copy of the private key.
+   * Disposes the signer, erasing its internal copy of the private key from memory.
    */
   dispose () {
     if (this._rawPrivateKey) {
