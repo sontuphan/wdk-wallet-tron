@@ -74,8 +74,7 @@ export default class PrivateKeySignerTron implements ISignerTron {
      */
     signTransaction(unsignedTx: Transaction): Promise<SignedTransaction>;
     /**
-     * Disposes the object along with all its data (cleaning up any sensitive field from memory): for a private-key signer,
-     * its internal copy of the private key.
+     * Disposes the signer, erasing its internal copy of the private key from memory.
      */
     dispose(): void;
     /** @private */

@@ -98,9 +98,10 @@ export default class WalletManagerTron extends WalletManager<ISignerTron> {
         signerName?: string;
     }): Promise<WalletAccountTron>;
     /**
-     * Disposes all wallet accounts, clearing secret material from memory, and the default signer if the manager built it
-     * from a seed. A signer supplied by the caller, as the default or via {@link addSigner}, is never disposed. Calling it
-     * again has no effect.
+     * Disposes the wallet accounts, erasing their private keys from memory, and the default signer if the manager
+     * created it from a seed. Signers you supplied are never disposed, so an account created directly on one with
+     * getAccount(signerName) keeps its key. The seed you passed in is never wiped (a seed phrase string stays in memory
+     * until it is garbage collected). Calling it again has no effect.
      */
     dispose(): void;
     /**
