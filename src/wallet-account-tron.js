@@ -281,7 +281,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {TransferOptions} options - The transfer's options.
    * @returns {Promise<TransferResult>} The transfer's result.
    * @throws {DisposalError} If the wallet account has been disposed.
-   * @throws {MaximumFeeExceededError} If the transfer's cost exceeds the maximum transfer fee option.
+   * @throws {MaximumFeeExceededError} If the transfer's cost, with its energy at full price, exceeds the maximum transfer fee option.
    * @throws {TransferError} If the account's token balance is below the transfer amount.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
@@ -292,15 +292,21 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
       throw new ProviderRequiredError('The wallet must be connected to tron web to transfer tokens.')
     }
 
-    const { fee } = await this.quoteTransfer({ token, recipient, amount })
+    const { transferMaxFee } = this._config
 
-    this._assertFeeWithinLimit(fee, this._config.transferMaxFee, 'Exceeded maximum fee cost for transfer operations.')
+    const { energyCost, totalEnergyCost, bandwidthCost } = await this._quoteTransferCosts({ token, recipient, amount })
+
+    const fee = energyCost + bandwidthCost
+
+    this._assertFeeWithinLimit(totalEnergyCost + bandwidthCost, transferMaxFee, 'Exceeded maximum fee cost for transfer operations.')
 
     const address = await this.getAddress()
     const addressHex = this._tronWeb.address.toHex(address)
 
     const options = {
-      feeLimit: Number(fee) || DEFAULT_FEE_LIMIT_SUN,
+      feeLimit: transferMaxFee === undefined
+        ? Number(totalEnergyCost > DEFAULT_FEE_LIMIT_SUN ? totalEnergyCost : DEFAULT_FEE_LIMIT_SUN)
+        : Number(BigInt(transferMaxFee) - bandwidthCost),
       callValue: 0,
       txLocal: true
     }
