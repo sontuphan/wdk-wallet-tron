@@ -81,12 +81,14 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
     sign(message: string): Promise<string>;
     /**
      * Signs a transaction.
+     * A prebuilt transaction is signed as given, including its reference block and expiration.
      *
      * @param {TronTransaction} tx - The transaction to sign.
      * @returns {Promise<TronSignedTransaction>} The signed transaction.
      * @throws {DisposalError} If the wallet account has been disposed.
      * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
      */
     signTransaction(tx: TronTransaction): Promise<TronSignedTransaction>;
     /**
@@ -94,16 +96,21 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      *
      * @param {TronTransaction | TronSignedTransaction} tx - The transaction, or a signed transaction.
      * @returns {Promise<Omit<TransactionResult, 'hash'> & TronActivationFee>} The transaction's quotes.
+     * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
      */
     quoteSendTransaction(tx: TronTransaction | TronSignedTransaction): Promise<Omit<TransactionResult, "hash"> & TronActivationFee>;
     /**
      * Sends a transaction.
+     * A prebuilt or signed transaction is sent as given, including its reference block and expiration.
      *
      * @param {TronTransaction | TronSignedTransaction} tx - The transaction, or a signed transaction.
      * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
      * @throws {DisposalError} If the wallet account has been disposed.
      * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
+     * @throws {ProviderError} If the node refuses to broadcast the transaction.
      */
     sendTransaction(tx: TronTransaction | TronSignedTransaction): Promise<TransactionResult & TronActivationFee>;
     /**
@@ -116,6 +123,8 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @throws {MaximumFeeExceededError} If the transfer's cost, with its energy at full price, exceeds the maximum transfer fee option.
      * @throws {TransferError} If the account's token balance is below the transfer amount.
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
+     * @throws {ProviderError} If the node refuses to broadcast the transaction.
      */
     transfer(options: TransferOptions): Promise<TransferResult>;
     /**
@@ -126,6 +135,8 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron impleme
      * @throws {DisposalError} If the wallet account has been disposed.
      * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
+     * @throws {ProviderError} If the node refuses to broadcast the transaction.
      */
     approve(options: ApproveOptions): Promise<TransactionResult & TronActivationFee>;
     /**
