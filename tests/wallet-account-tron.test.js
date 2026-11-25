@@ -1146,7 +1146,7 @@ describe('WalletAccountTron', () => {
         transaction: { raw_data_hex: '0a' + '00'.repeat(200) }
       })
       triggerSmartContractMock.mockResolvedValue({ transaction: DUMMY_TRIGGER_SMART_CONTRACT_RESULT })
-      sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
+      sendRawTransactionMock.mockResolvedValue({ result: true, txid: DUMMY_TX_ID })
       getAccountResourcesMock.mockResolvedValue({
         freeNetLimit: 0,
         freeNetUsed: 0,
@@ -1159,13 +1159,13 @@ describe('WalletAccountTron', () => {
 
       const { hash, fee } = await account.transfer(TRANSFER)
 
-      expect(hash).toBe(DUMMY_TX_ID)
+      expect(hash).toBe(DUMMY_TRIGGER_SMART_CONTRACT_RESULT.txID)
       expect(fee).toBe(345_000n)
 
       expect(triggerSmartContractMock).toHaveBeenCalledWith(
         TRANSFER.token,
         'transfer(address,uint256)',
-        { feeLimit: 15_000_000, callValue: 0, txLocal: true },
+        { feeLimit: 15_000_000, callValue: 0, txLocal: true, blockHeader: DUMMY_REF_BLOCK_PARAMS },
         [
           { type: 'address', value: TronWeb.address.toHex(TRANSFER.recipient) },
           { type: 'uint256', value: TRANSFER.amount }
@@ -1196,7 +1196,7 @@ describe('WalletAccountTron', () => {
         transaction: { raw_data_hex: '0a' + '00'.repeat(200) }
       })
       triggerSmartContractMock.mockResolvedValue({ transaction: DUMMY_TRIGGER_SMART_CONTRACT_RESULT })
-      sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
+      sendRawTransactionMock.mockResolvedValue({ result: true, txid: DUMMY_TX_ID })
       getAccountResourcesMock.mockResolvedValue({
         freeNetLimit: 0,
         freeNetUsed: 0,
@@ -1209,13 +1209,13 @@ describe('WalletAccountTron', () => {
 
       const { hash, fee } = await account.transfer(TRANSFER)
 
-      expect(hash).toBe(DUMMY_TX_ID)
+      expect(hash).toBe(DUMMY_TRIGGER_SMART_CONTRACT_RESULT.txID)
       expect(fee).toBe(21_345_000n)
 
       expect(triggerSmartContractMock).toHaveBeenCalledWith(
         TRANSFER.token,
         'transfer(address,uint256)',
-        { feeLimit: 21_000_000, callValue: 0, txLocal: true },
+        { feeLimit: 21_000_000, callValue: 0, txLocal: true, blockHeader: DUMMY_REF_BLOCK_PARAMS },
         [
           { type: 'address', value: TronWeb.address.toHex(TRANSFER.recipient) },
           { type: 'uint256', value: TRANSFER.amount }
@@ -1246,7 +1246,7 @@ describe('WalletAccountTron', () => {
         transaction: { raw_data_hex: '0a' + '00'.repeat(200) }
       })
       triggerSmartContractMock.mockResolvedValue({ transaction: DUMMY_TRIGGER_SMART_CONTRACT_RESULT })
-      sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
+      sendRawTransactionMock.mockResolvedValue({ result: true, txid: DUMMY_TX_ID })
       getAccountResourcesMock.mockResolvedValue({
         freeNetLimit: 0,
         freeNetUsed: 0,
@@ -1259,13 +1259,13 @@ describe('WalletAccountTron', () => {
 
       const { hash, fee } = await account.transfer(TRANSFER)
 
-      expect(hash).toBe(DUMMY_TX_ID)
+      expect(hash).toBe(DUMMY_TRIGGER_SMART_CONTRACT_RESULT.txID)
       expect(fee).toBe(345_000n)
 
       expect(triggerSmartContractMock).toHaveBeenCalledWith(
         TRANSFER.token,
         'transfer(address,uint256)',
-        { feeLimit: 21_000_000, callValue: 0, txLocal: true },
+        { feeLimit: 21_000_000, callValue: 0, txLocal: true, blockHeader: DUMMY_REF_BLOCK_PARAMS },
         [
           { type: 'address', value: TronWeb.address.toHex(TRANSFER.recipient) },
           { type: 'uint256', value: TRANSFER.amount }
@@ -1301,7 +1301,7 @@ describe('WalletAccountTron', () => {
         transaction: { raw_data_hex: '0a' + '00'.repeat(200) }
       })
       triggerSmartContractMock.mockResolvedValue({ transaction: DUMMY_TRIGGER_SMART_CONTRACT_RESULT })
-      sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
+      sendRawTransactionMock.mockResolvedValue({ result: true, txid: DUMMY_TX_ID })
       getAccountResourcesMock.mockResolvedValue({
         freeNetLimit: 0,
         freeNetUsed: 0,
@@ -1314,13 +1314,13 @@ describe('WalletAccountTron', () => {
 
       const { hash, fee } = await accountWithMaxFee.transfer(TRANSFER)
 
-      expect(hash).toBe(DUMMY_TX_ID)
+      expect(hash).toBe(DUMMY_TRIGGER_SMART_CONTRACT_RESULT.txID)
       expect(fee).toBe(345_000n)
 
       expect(triggerSmartContractMock).toHaveBeenCalledWith(
         TRANSFER.token,
         'transfer(address,uint256)',
-        { feeLimit: 4_655_000, callValue: 0, txLocal: true },
+        { feeLimit: 4_655_000, callValue: 0, txLocal: true, blockHeader: DUMMY_REF_BLOCK_PARAMS },
         [
           { type: 'address', value: TronWeb.address.toHex(TRANSFER.recipient) },
           { type: 'uint256', value: TRANSFER.amount }
