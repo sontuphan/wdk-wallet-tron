@@ -520,9 +520,9 @@ describe('WalletAccountTron', () => {
       expect(sendTrxMock).toHaveBeenCalledWith(TRANSACTION.to, TRANSACTION.value, ACCOUNT.address, { blockHeader: DUMMY_REF_BLOCK_PARAMS })
     })
 
-    test('should expire the transaction one minute after a node block that is less than a minute ahead of the device clock', async () => {
+    test('should expire the transaction one minute after a node block that is less than five minutes ahead of the device clock', async () => {
       const TRANSACTION = { to: RECIPIENT, value: 1_000_000 }
-      const BLOCK_TIMESTAMP = Date.now() + 30_000
+      const BLOCK_TIMESTAMP = Date.now() + 240_000
 
       getCurrentRefBlockParamsMock.mockResolvedValue({ ...DUMMY_REF_BLOCK_PARAMS, timestamp: BLOCK_TIMESTAMP })
       sendTrxMock.mockResolvedValue(transferTx(RECIPIENT))
@@ -539,8 +539,8 @@ describe('WalletAccountTron', () => {
       })
     })
 
-    test('should throw if the node\'s latest block is more than a minute ahead of the device clock', async () => {
-      getCurrentRefBlockParamsMock.mockResolvedValue({ ...DUMMY_REF_BLOCK_PARAMS, timestamp: Date.now() + 3_600_000 })
+    test('should throw if the node\'s latest block is more than five minutes ahead of the device clock', async () => {
+      getCurrentRefBlockParamsMock.mockResolvedValue({ ...DUMMY_REF_BLOCK_PARAMS, timestamp: Date.now() + 360_000 })
 
       await expect(account.signTransaction({ to: RECIPIENT, value: 1_000_000 }))
         .rejects.toStrictEqual(new AssertionError("The node's latest block is ahead of the device clock."))
@@ -725,14 +725,24 @@ describe('WalletAccountTron', () => {
       getAccountResourcesMock.mockResolvedValue({ freeNetLimit: 5000, freeNetUsed: 0, NetLimit: 0, NetUsed: 0 })
 
       await expect(account.sendTransaction({ to: RECIPIENT, value: 1_000_000 }))
-        .rejects.toStrictEqual(new ProviderError('The node refused the transaction (CONTRACT_VALIDATE_ERROR).', { reason: ProviderErrorReason.INTERNAL_SERVER_ERROR }))
+        .rejects.toStrictEqual(new ProviderError('The node refused the transaction (CONTRACT_VALIDATE_ERROR): Balance is not sufficient.', { reason: ProviderErrorReason.INTERNAL_SERVER_ERROR }))
+    })
+
+    test('should throw with the node\'s plain text reason if the node refuses the broadcast', async () => {
+      sendTrxMock.mockResolvedValue(transferTx(RECIPIENT))
+      sendRawTransactionMock.mockResolvedValue({ code: 'CONTRACT_VALIDATE_ERROR', txid: 'abc123def456', message: 'Balance is not sufficient.' })
+      getAccountMock.mockResolvedValue({ address: RECIPIENT })
+      getAccountResourcesMock.mockResolvedValue({ freeNetLimit: 5000, freeNetUsed: 0, NetLimit: 0, NetUsed: 0 })
+
+      await expect(account.sendTransaction({ to: RECIPIENT, value: 1_000_000 }))
+        .rejects.toStrictEqual(new ProviderError('The node refused the transaction (CONTRACT_VALIDATE_ERROR): Balance is not sufficient.', { reason: ProviderErrorReason.INTERNAL_SERVER_ERROR }))
     })
 
     test('should return the hash if the node already holds the transaction', async () => {
       const DUMMY_SEND_TRX_RESULT = transferTx(RECIPIENT)
 
       sendTrxMock.mockResolvedValue(DUMMY_SEND_TRX_RESULT)
-      sendRawTransactionMock.mockResolvedValue({ code: 'DUP_TRANSACTION_ERROR', txid: DUMMY_SEND_TRX_RESULT.txID, message: '5472616e73616374696f6e20616c7265616479206578697374732e' })
+      sendRawTransactionMock.mockResolvedValue({ code: 'DUP_TRANSACTION_ERROR', txid: 'dummy-node-tx-id', message: '5472616e73616374696f6e20616c7265616479206578697374732e' })
       getAccountMock.mockResolvedValue({ address: RECIPIENT })
       getAccountResourcesMock.mockResolvedValue({ freeNetLimit: 5000, freeNetUsed: 0, NetLimit: 0, NetUsed: 0 })
 
@@ -1398,7 +1408,7 @@ describe('WalletAccountTron', () => {
       expect(getChainParametersMock).toHaveBeenCalledWith()
     })
 
-    test('should throw if the node\'s latest block is more than a minute ahead of the device clock', async () => {
+    test('should throw if the node\'s latest block is more than five minutes ahead of the device clock', async () => {
       triggerConstantContractMock.mockResolvedValue({
         constant_result: ['0000000000000000000000000000000000000000000000000000000000000064'],
         energy_used: 10000,
@@ -1406,7 +1416,7 @@ describe('WalletAccountTron', () => {
       })
       getAccountResourcesMock.mockResolvedValue({ freeNetLimit: 5000, freeNetUsed: 0, NetLimit: 0, NetUsed: 0, EnergyLimit: 0, EnergyUsed: 0 })
       getChainParametersMock.mockResolvedValue([{ key: 'getEnergyFee', value: 420 }])
-      getCurrentRefBlockParamsMock.mockResolvedValue({ ...DUMMY_REF_BLOCK_PARAMS, timestamp: Date.now() + 3_600_000 })
+      getCurrentRefBlockParamsMock.mockResolvedValue({ ...DUMMY_REF_BLOCK_PARAMS, timestamp: Date.now() + 360_000 })
 
       await expect(account.transfer({
         token: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',

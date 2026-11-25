@@ -215,13 +215,14 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
   /**
    * Signs a transaction.
+   * A prebuilt transaction is signed as given, including its reference block and expiration.
    *
    * @param {TronTransaction} tx - The transaction to sign.
    * @returns {Promise<TronSignedTransaction>} The signed transaction.
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    */
   async signTransaction (tx) {
     this._guardDisposed()
@@ -247,7 +248,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {TronTransaction | TronSignedTransaction} tx - The transaction, or a signed transaction.
    * @returns {Promise<Omit<TransactionResult, 'hash'> & TronActivationFee>} The transaction's quotes.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    */
   async quoteSendTransaction (tx) {
     return await super.quoteSendTransaction(tx)
@@ -255,13 +256,14 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
   /**
    * Sends a transaction.
+   * A prebuilt or signed transaction is sent as given, including its reference block and expiration.
    *
    * @param {TronTransaction | TronSignedTransaction} tx - The transaction, or a signed transaction.
    * @returns {Promise<TransactionResult & TronActivationFee>} The transaction's result.
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    * @throws {ProviderError} If the node refuses to broadcast the transaction.
    */
   async sendTransaction (tx) {
@@ -294,7 +296,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {MaximumFeeExceededError} If the transfer's cost, with its energy at full price, exceeds the maximum transfer fee option.
    * @throws {TransferError} If the account's token balance is below the transfer amount.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    * @throws {ProviderError} If the node refuses to broadcast the transaction.
    */
   async transfer ({ token, recipient, amount }) {
@@ -347,7 +349,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @throws {DisposalError} If the wallet account has been disposed.
    * @throws {MaximumFeeExceededError} If the transaction's cost exceeds the maximum transaction fee option.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    * @throws {ProviderError} If the node refuses to broadcast the transaction.
    */
   async approve (options) {
@@ -450,10 +452,14 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
   /** @private */
   async _broadcastTransaction (signedTransaction) {
-    const { result, code, Error: error } = await this._tronWeb.trx.sendRawTransaction(signedTransaction)
+    const { result, code, message, Error: error } = await this._tronWeb.trx.sendRawTransaction(signedTransaction)
 
     if (result !== true && code !== DUPLICATE_TRANSACTION_CODE) {
-      throw new ProviderError(`The node refused the transaction (${code ?? error ?? 'no result'}).`, { reason: ProviderErrorReason.INTERNAL_SERVER_ERROR })
+      const reason = this._tronWeb.utils.isHex(message) ? this._tronWeb.toUtf8(message) : message
+
+      const detail = reason ? `: ${reason}` : '.'
+
+      throw new ProviderError(`The node refused the transaction (${code ?? error ?? 'no result'})${detail}`, { reason: ProviderErrorReason.INTERNAL_SERVER_ERROR })
     }
 
     return signedTransaction.txID

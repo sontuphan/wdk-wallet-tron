@@ -115,9 +115,11 @@ const DEFAULT_WAIT_TIMEOUT_MS = 90_000
  */
 const TRANSACTION_EXPIRATION_MS = 60_000
 /**
- * How far ahead of the device clock the node's latest block may be before it is refused.
+ * How far ahead of the device clock the node's latest block may be before it is refused. It leaves room for a
+ * slow device clock, while keeping a signed transaction valid for at most a few minutes, not the 24 hours the
+ * network allows.
  */
-const BLOCK_TIME_TOLERANCE_MS = 60_000
+const BLOCK_TIME_TOLERANCE_MS = 300_000
 /**
  * The length of an ECDSA signature in bytes.
  */
@@ -246,7 +248,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * @param {TronTransaction} tx - The transaction.
    * @returns {Promise<Omit<TransactionResult, 'hash'> & TronActivationFee>} The transaction's quotes.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    */
   async quoteSendTransaction (tx) {
     if (!this._tronWeb) {
@@ -467,7 +469,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    * @param {TronTransaction} tx - The transaction.
    * @returns {Promise<Transaction>} The unsigned tron web transaction.
    * @throws {Error} If the transaction is invalid.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    */
   async _buildTransaction (tx) {
     if (WalletAccountReadOnlyTron._isPrebuiltTransaction(tx)) {
@@ -502,7 +504,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
    *
    * @protected
    * @returns {Promise<Partial<Transaction['raw_data']>>} The block header to build the transaction with.
-   * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+   * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
    */
   async _getBlockHeader () {
     const { ref_block_bytes: refBlockBytes, ref_block_hash: refBlockHash, timestamp } = await this._tronWeb.trx.getCurrentRefBlockParams()

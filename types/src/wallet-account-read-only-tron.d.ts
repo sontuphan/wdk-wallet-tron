@@ -45,7 +45,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @param {TronTransaction} tx - The transaction.
      * @returns {Promise<Omit<TransactionResult, 'hash'> & TronActivationFee>} The transaction's quotes.
      * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
-     * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
      */
     quoteSendTransaction(tx: TronTransaction): Promise<Omit<TransactionResult, "hash"> & TronActivationFee>;
     /**
@@ -143,7 +143,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      * @param {TronTransaction} tx - The transaction.
      * @returns {Promise<Transaction>} The unsigned tron web transaction.
      * @throws {Error} If the transaction is invalid.
-     * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
      */
     protected _buildTransaction(tx: TronTransaction): Promise<Transaction>;
     /**
@@ -152,7 +152,7 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
      *
      * @protected
      * @returns {Promise<Partial<Transaction['raw_data']>>} The block header to build the transaction with.
-     * @throws {AssertionError} If the node's latest block is more than one minute ahead of the device clock.
+     * @throws {AssertionError} If the node's latest block is too far ahead of the device clock.
      */
     protected _getBlockHeader(): Promise<Partial<Transaction["raw_data"]>>;
     /**
