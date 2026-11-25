@@ -50,6 +50,8 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
     /**
      * Quotes the costs of TRC-20 transfer operation.
      * TRC-20 transfers do not incur an account activation fee.
+     * The quoted fee is net of the account's staked energy; `transfer` checks the maximum transfer fee
+     * against the transfer's energy at full price.
      *
      * @param {TransferOptions} options - The transfer's options.
      * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
@@ -307,7 +309,7 @@ export type TronWalletConfig = {
      */
     retries?: number;
     /**
-     * - The maximum fee amount for transfer operations. Less the bandwidth cost, it is also the most a transfer may burn for energy on chain.
+     * - The maximum fee amount for transfer operations. The transfer's energy counts at full price, even when the account's staked energy covers it, since the fee limit signed on chain caps all the energy the transfer uses.
      */
     transferMaxFee?: number | bigint;
     /**
@@ -360,6 +362,10 @@ export type TronContractCosts = {
      * - The TRX (in suns) burned for the energy the account's staked energy does not cover.
      */
     energyCost: bigint;
+    /**
+     * - The value (in suns) of all the energy the call uses, staked energy included.
+     */
+    totalEnergyCost: bigint;
     /**
      * - The TRX (in suns) burned for the bandwidth the account's free and staked bandwidth do not cover.
      */

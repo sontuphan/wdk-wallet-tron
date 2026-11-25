@@ -281,8 +281,7 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
    * @param {TransferOptions} options - The transfer's options.
    * @returns {Promise<TransferResult>} The transfer's result.
    * @throws {DisposalError} If the wallet account has been disposed.
-   * @throws {MaximumFeeExceededError} If the transfer's cost exceeds the maximum transfer fee option.
-   * @throws {MaximumFeeExceededError} If the maximum transfer fee option does not exceed the transfer's bandwidth cost, leaving no budget for energy.
+   * @throws {MaximumFeeExceededError} If the transfer's cost, with its energy at full price, exceeds the maximum transfer fee option.
    * @throws {TransferError} If the account's token balance is below the transfer amount.
    * @throws {ProviderRequiredError} If the wallet is not connected to tron web.
    */
@@ -295,22 +294,18 @@ export default class WalletAccountTron extends WalletAccountReadOnlyTron {
 
     const { transferMaxFee } = this._config
 
-    const { energyCost, bandwidthCost } = await this._quoteTransferCosts({ token, recipient, amount })
+    const { energyCost, totalEnergyCost, bandwidthCost } = await this._quoteTransferCosts({ token, recipient, amount })
 
     const fee = energyCost + bandwidthCost
 
-    this._assertFeeWithinLimit(fee, transferMaxFee, 'Exceeded maximum fee cost for transfer operations.')
-
-    if (transferMaxFee !== undefined && BigInt(transferMaxFee) <= bandwidthCost) {
-      throw new MaximumFeeExceededError('The maximum fee for transfer operations leaves no budget for energy.')
-    }
+    this._assertFeeWithinLimit(totalEnergyCost + bandwidthCost, transferMaxFee, 'Exceeded maximum fee cost for transfer operations.')
 
     const address = await this.getAddress()
     const addressHex = this._tronWeb.address.toHex(address)
 
     const options = {
       feeLimit: transferMaxFee === undefined
-        ? Number(fee > DEFAULT_FEE_LIMIT_SUN ? fee : DEFAULT_FEE_LIMIT_SUN)
+        ? Number(totalEnergyCost > DEFAULT_FEE_LIMIT_SUN ? totalEnergyCost : DEFAULT_FEE_LIMIT_SUN)
         : Number(BigInt(transferMaxFee) - bandwidthCost),
       callValue: 0,
       txLocal: true

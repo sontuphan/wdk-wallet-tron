@@ -1093,7 +1093,7 @@ describe('WalletAccountTron', () => {
       })
     })
 
-    test('should sign the quoted fee as the fee limit when it exceeds the default', async () => {
+    test('should sign the full energy cost as the fee limit when it exceeds the default', async () => {
       const TRANSFER = {
         token: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
         recipient: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
@@ -1130,7 +1130,57 @@ describe('WalletAccountTron', () => {
       expect(triggerSmartContractMock).toHaveBeenCalledWith(
         TRANSFER.token,
         'transfer(address,uint256)',
-        { feeLimit: 21_345_000, callValue: 0, txLocal: true },
+        { feeLimit: 21_000_000, callValue: 0, txLocal: true },
+        [
+          { type: 'address', value: TronWeb.address.toHex(TRANSFER.recipient) },
+          { type: 'uint256', value: TRANSFER.amount }
+        ],
+        TronWeb.address.toHex(ACCOUNT.address)
+      )
+      expect(sendRawTransactionMock).toHaveBeenCalledWith({
+        ...DUMMY_TRIGGER_SMART_CONTRACT_RESULT,
+        signature: [EXPECTED_SIGNATURE]
+      })
+    })
+
+    test('should sign the full energy cost as the fee limit when staked energy covers the call and no max fee is set', async () => {
+      const TRANSFER = {
+        token: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
+        recipient: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
+        amount: 100_000_000
+      }
+      const DUMMY_TX_ID = 'xyz789abc123'
+      const DUMMY_TRIGGER_SMART_CONTRACT_RESULT = {
+        txID: '12a406f767b30e00b317758aa25fcddc0ff8a329b7cad741dd204676d0e6c5ce',
+        raw_data_hex: '0a' + '00'.repeat(200)
+      }
+      const EXPECTED_SIGNATURE = 'b4273d17c4b46fb47d59b5aca2b4134cd83e02394a28bc4e86ffda7cbe1a21762b96e3af3d273d7e874153100fb2f1510f7e6579fa5ea9dde9107d4d15e1541100'
+      triggerConstantContractMock.mockResolvedValue({
+        constant_result: ['0000000000000000000000000000000000000000000000000000000000000064'],
+        energy_used: 50000,
+        transaction: { raw_data_hex: '0a' + '00'.repeat(200) }
+      })
+      triggerSmartContractMock.mockResolvedValue({ transaction: DUMMY_TRIGGER_SMART_CONTRACT_RESULT })
+      sendRawTransactionMock.mockResolvedValue({ txid: DUMMY_TX_ID })
+      getAccountResourcesMock.mockResolvedValue({
+        freeNetLimit: 0,
+        freeNetUsed: 0,
+        NetLimit: 0,
+        NetUsed: 0,
+        EnergyLimit: 50000,
+        EnergyUsed: 0
+      })
+      getChainParametersMock.mockResolvedValue([{ key: 'getEnergyFee', value: 420 }])
+
+      const { hash, fee } = await account.transfer(TRANSFER)
+
+      expect(hash).toBe(DUMMY_TX_ID)
+      expect(fee).toBe(345_000n)
+
+      expect(triggerSmartContractMock).toHaveBeenCalledWith(
+        TRANSFER.token,
+        'transfer(address,uint256)',
+        { feeLimit: 21_000_000, callValue: 0, txLocal: true },
         [
           { type: 'address', value: TronWeb.address.toHex(TRANSFER.recipient) },
           { type: 'uint256', value: TRANSFER.amount }
@@ -1198,7 +1248,7 @@ describe('WalletAccountTron', () => {
       })
     })
 
-    test('should throw if the transfer max fee does not exceed the bandwidth cost', async () => {
+    test('should throw if the transfer max fee does not cover the energy at full price, even when staked energy covers it', async () => {
       triggerConstantContractMock.mockResolvedValue({
         constant_result: ['0000000000000000000000000000000000000000000000000000000000000064'],
         energy_used: 10000,
@@ -1216,14 +1266,14 @@ describe('WalletAccountTron', () => {
 
       const accountWithMaxFee = new WalletAccountTron(SEED_PHRASE, "0'/0/0", {
         provider: 'https://tron.web.provider/',
-        transferMaxFee: 345_000
+        transferMaxFee: 1_000_000
       })
 
       await expect(accountWithMaxFee.transfer({
         token: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
         recipient: 'TAibbFBAkcNioexXTFWKbp65mgLp7JiqHD',
         amount: 100_000_000
-      })).rejects.toStrictEqual(new MaximumFeeExceededError('The maximum fee for transfer operations leaves no budget for energy.'))
+      })).rejects.toStrictEqual(new MaximumFeeExceededError('Exceeded maximum fee cost for transfer operations.'))
 
       expect(triggerSmartContractMock).not.toHaveBeenCalled()
     })

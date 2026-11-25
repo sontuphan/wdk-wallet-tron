@@ -71,7 +71,7 @@ import { TronWeb, Trx } from 'tronweb'
  * @typedef {Object} TronWalletConfig
  * @property {string | TronWeb | (string | TronWeb)[]} [provider] - The url of the tron web provider, or an instance of the {@link TronWeb} class. It's also possible to provide a list of urls or {@link TronWeb} instances instead. In such case, connection errors will cause the wallet to automatically fallback on the next provider in the list. When passing {@link TronWeb} instances, the first one becomes the wallet's primary client; the others contribute only their `fullNode` / `solidityNode` / `eventServer` to the failover pool.
  * @property {number} [retries] - If set and if 'provider' is a list of urls or {@link TronWeb} instances, the number of additional retry attempts after the initial call fails. Total attempts = `1 + retries`. For example, `retries: 3` with 4 providers will try each provider once before throwing. If `retries` exceeds the number of providers, the failover will loop back and retry already-failed providers in round-robin order. Default: 3.
- * @property {number | bigint} [transferMaxFee] - The maximum fee amount for transfer operations. Less the bandwidth cost, it is also the most a transfer may burn for energy on chain.
+ * @property {number | bigint} [transferMaxFee] - The maximum fee amount for transfer operations. The transfer's energy counts at full price, even when the account's staked energy covers it, since the fee limit signed on chain caps all the energy the transfer uses.
  * @property {number | bigint} [transactionMaxFee] - The maximum fee amount for sendTransaction and signTransaction operations.
  */
 
@@ -101,6 +101,7 @@ import { TronWeb, Trx } from 'tronweb'
  *
  * @typedef {Object} TronContractCosts
  * @property {bigint} energyCost - The TRX (in suns) burned for the energy the account's staked energy does not cover.
+ * @property {bigint} totalEnergyCost - The value (in suns) of all the energy the call uses, staked energy included.
  * @property {bigint} bandwidthCost - The TRX (in suns) burned for the bandwidth the account's free and staked bandwidth do not cover.
  */
 
@@ -251,6 +252,8 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
   /**
    * Quotes the costs of TRC-20 transfer operation.
    * TRC-20 transfers do not incur an account activation fee.
+   * The quoted fee is net of the account's staked energy; `transfer` checks the maximum transfer fee
+   * against the transfer's energy at full price.
    *
    * @param {TransferOptions} options - The transfer's options.
    * @returns {Promise<Omit<TransferResult, 'hash'>>} The transfer's quotes.
@@ -645,9 +648,11 @@ export default class WalletAccountReadOnlyTron extends WalletAccountReadOnly {
 
     const energyCost = this._netEnergyCost(energyUsed, energyPrice, resources)
 
+    const totalEnergyCost = BigInt(energyUsed || 0) * BigInt(energyPrice)
+
     const bandwidthCost = await this._getBandwidthCost(transaction, { isActivation: false, resources })
 
-    return { energyCost, bandwidthCost }
+    return { energyCost, totalEnergyCost, bandwidthCost }
   }
 
   /**
